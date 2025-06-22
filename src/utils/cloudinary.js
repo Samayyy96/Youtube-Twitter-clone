@@ -18,7 +18,8 @@ import fs from "fs"
                 resource_type:"auto"
             }) 
             //file has been uploaded succesfully
-            console.log("file has been uploaded sucessfully",response.url);
+            // console.log("file has been uploaded sucessfully",response.url);
+            fs.unlinkSync(localfilepath)
             return response
             
         } catch (error) {
