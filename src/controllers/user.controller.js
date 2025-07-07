@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiresponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async(userId) => {
     try {
@@ -110,8 +111,8 @@ const loginUser = asynchandler(async(req,res) => {
         }
     }
 
-    const user = User.findOne({
-        $or:[{username,email}]
+    const user = await User.findOne({
+        $or:[{username},{email}]
     })
 
     if(!user){
