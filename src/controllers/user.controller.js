@@ -1,4 +1,4 @@
-import { asynchandler } from "../utils/asynchandler.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { apierrors } from "../utils/apierrors.js";
 import { User } from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
@@ -21,7 +21,7 @@ const generateAccessAndRefreshToken = async(userId) => {
     }
 }
 
-const registerUser = asynchandler(async (req,res) => {
+const registerUser = asyncHandler(async (req,res) => {
 
     //REGISTER USER STEPS
     //validation process (includes checking all fields are empty or not)
@@ -95,7 +95,7 @@ const registerUser = asynchandler(async (req,res) => {
    
 })
 
-const loginUser = asynchandler(async(req,res) => {
+const loginUser = asyncHandler(async(req,res) => {
     //req body se data le aao
     //username or email
     //find the user
@@ -150,7 +150,7 @@ const loginUser = asynchandler(async(req,res) => {
 
 })
 
-const logoutuser = asynchandler(async(req,res) => {
+const logoutuser = asyncHandler(async(req,res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -174,7 +174,7 @@ const logoutuser = asynchandler(async(req,res) => {
     .json(new ApiResponse(200, {}, "User logged Out"))
 })
 
-const refreshAccessToken = asynchandler(async (req, res) => {
+const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
     if (!incomingRefreshToken) {
@@ -222,7 +222,7 @@ const refreshAccessToken = asynchandler(async (req, res) => {
 
 })
 
-const changeCurrentPassword = asynchandler(async(req,res) => { 
+const changeCurrentPassword = asyncHandler(async(req,res) => { 
     const {oldPassword,newPassword} = req.body
     const user = await User.findById(req.user?._id)
     const isPasswordCorrect = user.isPasswordCorrect(oldPassword)
@@ -237,7 +237,7 @@ const changeCurrentPassword = asynchandler(async(req,res) => {
     .json(new ApiResponse(200,{},"Password changes Successfully"))
 })
 
-const getCurrentUser = asynchandler(async(req, res) => {
+const getCurrentUser = asyncHandler(async(req, res) => {
     return res
     .status(200)
     .json(new ApiResponse(
@@ -247,7 +247,7 @@ const getCurrentUser = asynchandler(async(req, res) => {
     ))
 })
 
-const updateAccountDetails = asynchandler(async(req, res) => {
+const updateAccountDetails = asyncHandler(async(req, res) => {
     const {fullName, email} = req.body
 
     if (!fullName || !email) {
@@ -271,12 +271,14 @@ const updateAccountDetails = asynchandler(async(req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"))
 });
 
-const updateUserAvatar = asynchandler(async(req, res) => { 
+const updateUserAvatar = asyncHandler(async(req, res) => { 
     const avatarLocalPath = req.file?.path
 
     if (!avatarLocalPath) {
         throw new apierrors(400, "Avatar file is missing")
     }
+
+    //TODO: delete old image - assignment
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
@@ -284,8 +286,6 @@ const updateUserAvatar = asynchandler(async(req, res) => {
         throw new apierrors(400, "Error while uploading on avatar")
         
     }
-
-    const avatarToDelete = user.avatar.public_id;
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -297,10 +297,6 @@ const updateUserAvatar = asynchandler(async(req, res) => {
         {new: true}
     ).select("-password")
 
-    if (avatarToDelete && updatedUser.avatar.public_id) {
-        await deleteOnCloudinary(avatarToDelete);
-    }
-
     return res
     .status(200)
     .json(
@@ -308,12 +304,15 @@ const updateUserAvatar = asynchandler(async(req, res) => {
     )
 })
 
-const updateUserCoverImage = asynchandler(async(req, res) => {
+const updateUserCoverImage = asyncHandler(async(req, res) => {
     const coverImageLocalPath = req.file?.path
 
     if (!coverImageLocalPath) {
         throw new apierrors(400, "Cover image file is missing")
     }
+
+    //TODO: delete old image - assignment
+
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
@@ -321,8 +320,6 @@ const updateUserCoverImage = asynchandler(async(req, res) => {
         throw new apierrors(400, "Error while uploading on avatar")
         
     }
-
-    const coverImageToDelete = user.coverImage.public_id;
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -334,11 +331,6 @@ const updateUserCoverImage = asynchandler(async(req, res) => {
         {new: true}
     ).select("-password")
 
-    if (coverImageToDelete && updatedUser.coverImage.public_id) {
-        await deleteOnCloudinary(coverImageToDelete);
-    }
-
-
     return res
     .status(200)
     .json(
@@ -346,7 +338,7 @@ const updateUserCoverImage = asynchandler(async(req, res) => {
     )
 })
 
-const getUserChannelProfile = asynchandler(async(req, res) => {
+const getUserChannelProfile = asyncHandler(async(req, res) => {
     const {username} = req.params
 
     if (!username?.trim()) {
@@ -418,7 +410,7 @@ const getUserChannelProfile = asynchandler(async(req, res) => {
     )
 })
 
-const getWatchHistory = asynchandler(async(req, res) => {
+const getWatchHistory = asyncHandler(async(req, res) => {
     const user = await User.aggregate([
         {
             $match: {
