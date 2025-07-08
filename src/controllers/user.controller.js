@@ -278,14 +278,14 @@ const updateUserAvatar = asynchandler(async(req, res) => {
         throw new apierrors(400, "Avatar file is missing")
     }
 
-    //TODO: delete old image - assignment
-
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
     if (!avatar.url) {
         throw new apierrors(400, "Error while uploading on avatar")
         
     }
+
+    const avatarToDelete = user.avatar.public_id;
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -296,6 +296,10 @@ const updateUserAvatar = asynchandler(async(req, res) => {
         },
         {new: true}
     ).select("-password")
+
+    if (avatarToDelete && updatedUser.avatar.public_id) {
+        await deleteOnCloudinary(avatarToDelete);
+    }
 
     return res
     .status(200)
@@ -311,15 +315,14 @@ const updateUserCoverImage = asynchandler(async(req, res) => {
         throw new apierrors(400, "Cover image file is missing")
     }
 
-    //TODO: delete old image - assignment
-
-
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
     if (!coverImage.url) {
         throw new apierrors(400, "Error while uploading on avatar")
         
     }
+
+    const coverImageToDelete = user.coverImage.public_id;
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -330,6 +333,11 @@ const updateUserCoverImage = asynchandler(async(req, res) => {
         },
         {new: true}
     ).select("-password")
+
+    if (coverImageToDelete && updatedUser.coverImage.public_id) {
+        await deleteOnCloudinary(coverImageToDelete);
+    }
+
 
     return res
     .status(200)
