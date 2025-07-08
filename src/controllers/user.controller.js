@@ -1,8 +1,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { apierrors } from "../utils/apierrors.js";
 import { User } from "../models/user.model.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
-import { ApiResponse } from "../utils/apiresponse.js";
+import { uploadOnCloudinary,deleteOnCloudinary } from "../utils/cloudinary.js"
+import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
@@ -287,6 +287,8 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
         
     }
 
+    const avatarToDelete = user.avatar.public_id;
+    
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -296,6 +298,10 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
         },
         {new: true}
     ).select("-password")
+
+    if (avatarToDelete && updatedUser.avatar.public_id) {
+        await deleteOnCloudinary(avatarToDelete);
+    }
 
     return res
     .status(200)
@@ -321,6 +327,8 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
         
     }
 
+    const coverImageToDelete = user.coverImage.public_id;
+
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -330,6 +338,11 @@ const updateUserCoverImage = asyncHandler(async(req, res) => {
         },
         {new: true}
     ).select("-password")
+
+    if (coverImageToDelete && updatedUser.coverImage.public_id) {
+        await deleteOnCloudinary(coverImageToDelete);
+    }
+
 
     return res
     .status(200)
