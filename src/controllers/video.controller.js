@@ -12,89 +12,40 @@ import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/like.model.js";
 
 
+// src/controllers/video.controller.js
+
+// A RADICALLY SIMPLIFIED VERSION FOR DEBUGGING
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
-    //TODO: get all videos based on query, sort, pagination
-    const pipeline = [];
+    console.log("Attempting to fetch all published videos...");
 
-    // NOTES : 
-    // for using Full Text based search u need to create a search index in mongoDB atlas
-    // you can include field mapppings in search index eg.title, description, as well
-    // Field mappings specify which fields within your documents should be indexed for text search.
-    // this helps in seraching only in title, desc providing faster search results
-    // here the name of search index is 'search-videos'
+    try {
+        // We are using the simplest possible query:
+        // Find all documents in the 'Video' collection
+        // where the 'isPublished' field is true.
+        const videos = await Video.find({ isPublished: true });
 
-    if (query) {
-        pipeline.push({
-            $search: {
-                index: "search-videos",
-                text: {
-                    query: query,
-                    path: ["title", "description"] //search only on title, desc
-                }
-            }
-        });
+        console.log(`Found ${videos.length} videos.`);
+
+        // We are not using pagination for this test, so the response structure is simpler.
+        // This mimics the structure your frontend expects from the paginator.
+        const responseData = {
+            docs: videos,
+            totalDocs: videos.length,
+            limit: videos.length,
+            totalPages: 1,
+            page: 1,
+        };
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, responseData, "Videos fetched successfully (simple query)."));
+
+    } catch (error) {
+        console.error("Error during simple find query:", error);
+        throw new ApiError(500, "Something went wrong while fetching videos.");
     }
+});
 
-    if (userId) {
-        if (!isValidObjectId(userId)) {
-            throw new apierrors(400, "Invalid userId");
-        }
-
-        pipeline.push({
-            $match: {
-                owner: new mongoose.Types.ObjectId(userId)
-            }
-        });
-    }
-
-    pipeline.push({ $match: { isPublished: true } });
-
-    if (sortBy && sortType) {
-        pipeline.push({
-            $sort: {
-                [sortBy]: sortType === "asc" ? 1 : -1
-            }
-        });
-    } else {
-        pipeline.push({ $sort: { createdAt: -1 } });
-    }
-
-    pipeline.push(
-        {
-            $lookup: {
-                from: "users",
-                localField: "owner",
-                foreignField: "_id",
-                as: "ownerDetails",
-                pipeline: [
-                    {
-                        $project: {
-                            username: 1,
-                            "avatar.url": 1
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            $unwind: "$ownerDetails"
-        }
-    )
-
-    const videoAggregate = Video.aggregate(pipeline);
-
-    const options = {
-        page: parseInt(page, 10),
-        limit: parseInt(limit, 10)
-    };
-
-    const video = await Video.aggregatePaginate(videoAggregate, options);
-
-    return res
-        .status(200)
-        .json(new ApiResponse(200, video, "Videos fetched successfully"));
-})
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
@@ -140,7 +91,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
             public_id: thumbnail.public_id
         },
         owner: req.user?._id,
-        isPublished: false
+        isPublished: true
     });
 
     const videoUploaded = await Video.findById(video._id);
