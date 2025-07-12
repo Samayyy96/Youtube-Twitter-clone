@@ -17,5 +17,6 @@ export interface Video {
     };
     views: number;
     createdAt: string;
-    //  other fields will come here, like description, duration, etc.
+    duration: number;
+    //  other fields will come here, like description, etc.
 }

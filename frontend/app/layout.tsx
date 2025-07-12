@@ -22,7 +22,7 @@ export default function RootLayout({
             <Sidebar />
             <main className="flex-1 flex flex-col overflow-y-auto">
               <Navbar />
-              <div className="p-4 md:p-6">{children}</div>
+              <div>{children}</div>
             </main>
           </div>
         </AuthProvider> {/* <-- CLOSE WRAPPER */}
