@@ -6,16 +6,17 @@ import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { GoPlusCircle, GoSearch } from 'react-icons/go';
 import { IoNotificationsOutline } from 'react-icons/io5';
-import { useState, useEffect } from 'react'; // Import hooks
+import { useState, useEffect } from 'react'; 
+import { HiMenu } from 'react-icons/hi';
 
-// A simple type for the user data we expect to fetch
+
 interface CurrentUser {
     username: string;
     avatar?: { url: string };
 }
 
 export default function Navbar() {
-  const { isLoggedIn, logout } = useAuth(); // Get login state from our simple context
+  const { isLoggedIn, logout ,toggleSidebar } = useAuth(); 
   
   // 1. ADD NEW STATE to hold the user's details
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
@@ -52,7 +53,12 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-4 py-2 bg-[#0F0F0F] border-b border-gray-800">
-      <Link href="/" className="text-xl font-bold">MyTube</Link>
+      <div className="flex items-center gap-4">
+        <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-gray-700">
+            <HiMenu className="text-xl" />
+        </button>
+        <Link href="/" className="text-xl font-bold">MyTube</Link>
+      </div>
 
       {/* Search Bar */}
       <div className="flex-grow max-w-2xl hidden sm:flex">

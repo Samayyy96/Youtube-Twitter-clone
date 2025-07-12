@@ -3,17 +3,21 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// === THE FIX IS HERE (in the type definition) ===
+//this also contains the shared state for sidebar toggle
+
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: (token: string) => void; // It now correctly expects a 'token' string
+  login: (token: string) => void; 
   logout: () => void;
+  isSidebarOpen: boolean; 
+  toggleSidebar: () => void; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+  
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
@@ -24,6 +28,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  //sidebar toggle state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
@@ -32,9 +39,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  // === AND THE FIX IS HERE (in the implementation) ===
   const login = (token: string) => {
-    // 1. Save the token to localStorage. This is what we were missing.
+    // 1. Save the token to localStorage.
     localStorage.setItem('accessToken', token);
     // 2. Update the application's state to reflect the login.
     setIsLoggedIn(true);
@@ -46,12 +52,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = '/'; 
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => !prev);
+  };
+
   if (isLoading) {
     return null;
   }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, isSidebarOpen, toggleSidebar }}>
       {children}
     </AuthContext.Provider>
   );

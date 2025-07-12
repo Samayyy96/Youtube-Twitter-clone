@@ -48,7 +48,7 @@ export default function TagsBar() {
     ];
 
     return (
-        <div className="sticky top-[57px] bg-[#0F0F0F] z-40 py-2 border-b border-gray-800 center">
+        <div className="top-[57px] bg-[#0F0F0F] z-40 py-2 border-b border-gray-800 center">
             <div className="flex items-center gap-3 overflow-x-auto pb-2 px-4 md:px-6 no-scrollbar">
                 {categories.map(category => (
                     <div key={category} onClick={() => handleFilter('query', category)}>
