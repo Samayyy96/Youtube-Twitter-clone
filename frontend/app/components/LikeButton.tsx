@@ -4,6 +4,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ThumbsUp } from 'lucide-react';
+import { formatViews } from '@/lib/utils';
 
 interface LikeButtonProps {
   videoId: string;
@@ -52,18 +53,18 @@ export default function LikeButton({ videoId, initialLikesCount, initialIsLiked 
     });
   };
 
-  const buttonClasses = isLiked
-    ? 'bg-blue-600 text-white hover:bg-blue-700'
-    : 'bg-gray-800 text-white hover:bg-gray-700';
+const buttonClasses = isLiked
+        ? 'bg-gray-700' // Liked state can be subtle
+        : 'bg-gray-800';
 
-  return (
-    <button
-      onClick={handleLike}
-      disabled={isPending}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${buttonClasses} disabled:opacity-50`}
-    >
-      <ThumbsUp size={16} fill={isLiked ? 'currentColor' : 'none'} />
-      {likesCount}
-    </button>
-  );
+    return (
+        <button
+            onClick={handleLike}
+            disabled={isPending}
+            className={`flex items-center gap-2 pl-4 pr-3 py-2 hover:bg-gray-700 rounded-l-full text-sm font-semibold transition-colors ${buttonClasses} disabled:opacity-50`}
+        >
+            <ThumbsUp size={16} fill={isLiked ? 'currentColor' : 'none'} />
+            {formatViews(likesCount)}
+        </button>
+    );
 }
