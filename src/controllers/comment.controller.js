@@ -93,8 +93,16 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 // add a comment to a video
 const addComment = asyncHandler(async (req, res) => {
+
+     console.log("--- Add Comment Controller Reached ---");
+    console.log("Request Body:", req.body);
+    console.log("Request User:", req.user?._id);
+    console.log("Request Params (videoId):", req.params.videoId);
+
     const { videoId } = req.params;
     const { content } = req.body;
+
+    
 
     if (!content) {
         throw new apierrors(400, "Content is required");

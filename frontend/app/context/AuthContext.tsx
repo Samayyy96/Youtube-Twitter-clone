@@ -11,6 +11,7 @@ interface AuthContextType {
   logout: () => void;
   isSidebarOpen: boolean; 
   toggleSidebar: () => void; 
+  closeSidebar: () => void;   //complete close
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,12 +57,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsSidebarOpen(prev => !prev);
   };
 
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
+
   if (isLoading) {
     return null;
   }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, isSidebarOpen, toggleSidebar }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, isSidebarOpen, toggleSidebar, closeSidebar  }}>
       {children}
     </AuthContext.Provider>
   );
