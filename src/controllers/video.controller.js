@@ -15,33 +15,122 @@ import { Like } from "../models/like.model.js";
 // src/controllers/video.controller.js
 
 // A RADICALLY SIMPLIFIED VERSION FOR DEBUGGING
+// src/controllers/video.controller.js
+
 const getAllVideos = asyncHandler(async (req, res) => {
-    console.log("Attempting to fetch all published videos...");
+    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
+
+    const pipeline = [];
+
+    // --- Stage 1: Text Search (Optional) ---
+    // If a search query is provided, this stage runs first to filter by text.
+    if (query) {
+        pipeline.push({
+            $search: {
+                index: "search-videos", // Make sure this index exists in your MongoDB Atlas cluster
+                text: {
+                    query: query,
+                    path: ["title", "description"],
+                },
+            },
+        });
+    }
+
+    // --- Stage 2: Content Filtering ---
+    // This is the main filter. It's now robust.
+    if (userId) {
+        // If a specific user's videos are requested, filter by their owner ID.
+        if (!isValidObjectId(userId)) {
+            throw new ApiError(400, "Invalid userId");
+        }
+        pipeline.push({
+            $match: {
+                owner: new mongoose.Types.ObjectId(userId),
+            },
+        });
+    } else {
+        // For the public homepage, only show videos that are published.
+        pipeline.push({
+            $match: {
+                isPublished: true,
+            },
+        });
+    }
+
+    // --- Stage 3: Sorting ---
+    // Sorts the results. Defaults to newest first.
+    if (sortBy && sortType) {
+        pipeline.push({
+            $sort: {
+                [sortBy]: sortType === "asc" ? 1 : -1,
+            },
+        });
+    } else {
+        pipeline.push({ $sort: { createdAt: -1 } });
+    }
+
+    // --- Stage 4: Add Owner Information ---
+    // This is the powerful part. It looks up the owner's details from the 'users' collection.
+    pipeline.push(
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails",
+                pipeline: [
+                    {
+                        // We only take the fields we need from the user document
+                        $project: {
+                            username: 1,
+                            avatar: 1, // Project the entire avatar object for safety
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            // Deconstructs the 'ownerDetails' array to be a single object
+            $unwind: "$ownerDetails",
+        }
+    );
+
+    // --- Execute the Pipeline with Pagination ---
+    const videoAggregate = Video.aggregate(pipeline);
+
+    const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        // This helps in getting consistent results with pagination + aggregation
+        customLabels: {
+            totalDocs: 'totalVideos',
+            docs: 'videos'
+        }
+    };
 
     try {
-        // We are using the simplest possible query:
-        // Find all documents in the 'Video' collection
-        // where the 'isPublished' field is true.
-        const videos = await Video.find({ isPublished: true });
-
-        console.log(`Found ${videos.length} videos.`);
-
-        // We are not using pagination for this test, so the response structure is simpler.
-        // This mimics the structure your frontend expects from the paginator.
+        const result = await Video.aggregatePaginate(videoAggregate, options);
+        
+        // Let's rename the paginated result fields to match what your frontend might expect
         const responseData = {
-            docs: videos,
-            totalDocs: videos.length,
-            limit: videos.length,
-            totalPages: 1,
-            page: 1,
+            docs: result.videos,
+            totalDocs: result.totalVideos,
+            limit: result.limit,
+            page: result.page,
+            totalPages: result.totalPages,
+            pagingCounter: result.pagingCounter,
+            hasPrevPage: result.hasPrevPage,
+            hasNextPage: result.hasNextPage,
+            prevPage: result.prevPage,
+            nextPage: result.nextPage,
         };
 
         return res
             .status(200)
-            .json(new ApiResponse(200, responseData, "Videos fetched successfully (simple query)."));
+            .json(new ApiResponse(200, responseData, "Videos fetched successfully"));
 
     } catch (error) {
-        console.error("Error during simple find query:", error);
+        console.error("Aggregation failed:", error);
         throw new ApiError(500, "Something went wrong while fetching videos.");
     }
 });

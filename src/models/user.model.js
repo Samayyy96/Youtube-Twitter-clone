@@ -2,6 +2,10 @@ import mongoose, {Schema} from "mongoose";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
+
+// Fix : the user model saves the avatr and coverimage as a string and not as a url so we need to fix it 
+// and keep it same as how video model saves it
+
 const userSchema = new Schema(
     {
         username: {
@@ -26,11 +30,17 @@ const userSchema = new Schema(
             index: true
         },
         avatar: {
-            type: String, // cloudinary url
+            type: {
+                url: String,
+                public_id: String,
+            },
             required: true,
         },
         coverImage: {
-            type: String, // cloudinary url
+            type: {
+                url: String,
+                public_id: String,
+            },
         },
         watchHistory: [
             {

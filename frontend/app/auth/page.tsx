@@ -1,5 +1,3 @@
-// app/auth/page.tsx
-
 'use client';
 
 import { useState, FormEvent } from 'react';

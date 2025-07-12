@@ -73,8 +73,17 @@ const registerUser = asyncHandler(async (req,res) => {
 
     const user = await User.create({
         fullName,
-        avatar: avatar.url,
-        coverImage: coverImage?.url || "",
+
+        // fix : the user model saves the avatar and coverImage as an object with url and public_id
+        // so we need to change the way we save it
+        
+        avatar: {
+            url: avatar.url,
+            public_id: avatar.public_id
+        },
+        
+        coverImage: coverImage ? { url: coverImage.url, public_id: coverImage.public_id } : undefined,
+
         email, 
         password,
         username: username.toLowerCase()

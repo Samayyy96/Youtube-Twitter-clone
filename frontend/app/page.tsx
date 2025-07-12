@@ -16,27 +16,17 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
   
   // Get the logged-in status to decide whether to fetch
-  const { isLoggedIn } = useAuth();
 
   // 3. Use useEffect to fetch data when the component loads (or when login status changes).
   useEffect(() => {
     // Don't bother fetching if the user isn't logged in.
-    if (!isLoggedIn) {
-      setIsLoading(false);
-      return;
-    }
+    
 
     const fetchVideos = async () => {
       setIsLoading(true);
       setError(null);
 
-      // 4. Get the token from localStorage, just like the upload page.
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        setError("You are not logged in.");
-        setIsLoading(false);
-        return;
-      }
+      
 
       try {
         // 5. Make the fetch call WITH the Authorization header.
@@ -60,7 +50,7 @@ export default function HomePage() {
     };
 
     fetchVideos();
-  }, [isLoggedIn]); // Re-run this effect if the login status changes.
+  }, []); // Re-run this effect if the login status changes.
 
 
   // 6. Render UI based on the current state.
@@ -72,9 +62,7 @@ export default function HomePage() {
     return <p className="text-center mt-8 text-red-400">Error: {error}</p>;
   }
   
-  if (!isLoggedIn) {
-      return <p className="text-center mt-8 text-gray-400">Please log in to see videos.</p>
-  }
+  
 
   return (
     <div>
