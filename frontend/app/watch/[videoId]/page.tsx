@@ -1,12 +1,11 @@
-// app/watch/[videoId]/page.tsx
-
 'use client';
 
 import { useEffect, useState, use } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation'; // 1. IMPORT THE ROUTER
 import Link from 'next/link';
-import { formatTimeAgo, formatViews } from '@/lib/utils'; // We'll add formatViews
-import { ThumbsUp, ThumbsDown, Share, Download, MoreHorizontal } from 'lucide-react';
+import { formatTimeAgo, formatViews } from '@/lib/utils';
+import { ThumbsDown, Share, Download, MoreHorizontal } from 'lucide-react';
 import SubscribeButton from '@/app/components/SubscribeButton';
 import CommentsSection from '@/app/components/CommentsSection';
 import SuggestedVideos from '@/app/components/SuggestedVideos';
@@ -34,23 +33,48 @@ interface VideoDetails {
 
 export default function WatchPage({ params }: { params: { videoId: string } }) {
     const { videoId } = params;
-    const { closeSidebar, isSidebarOpen } = useAuth();
+    const { isLoggedIn, closeSidebar, isSidebarOpen } = useAuth(); // 2. GET isLoggedIn FROM CONTEXT
+    const router = useRouter(); // 3. INITIALIZE THE ROUTER
 
     const [video, setVideo] = useState<VideoDetails | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showFullDescription, setShowFullDescription] = useState(false);
 
-    // useEffect for sidebar collapse and data fetching remains the same
+    // 4. ADD useEffect TO CHECK AUTH STATUS AND REDIRECT
+    useEffect(() => {
+        // The AuthProvider sets isLoggedIn after checking the token.
+        // If it's explicitly false, the user is not logged in.
+        if (isLoggedIn === false) {
+            router.push('/auth');
+        }
+    }, [isLoggedIn, router]);
+
+    // This effect for collapsing the sidebar remains the same
     useEffect(() => {
         if (isSidebarOpen) closeSidebar();
     }, [isSidebarOpen, closeSidebar]);
 
+    // This effect for fetching data now depends on isLoggedIn
     useEffect(() => {
+        // Don't bother fetching if we know the user is not logged in.
+        if (!isLoggedIn) {
+            setIsLoading(false); // Stop the loading state
+            return;
+        }
+
         const fetchVideoDetails = async () => {
             setIsLoading(true);
             const token = localStorage.getItem('accessToken');
-            const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {};
+            // We can be more confident the token exists now, but a check is still good practice.
+            if (!token) {
+                setError("Authentication token is missing.");
+                setIsLoading(false);
+                return;
+            }
+
+            const headers: HeadersInit = { 'Authorization': `Bearer ${token}` };
+            
             try {
                 const res = await fetch(`http://localhost:3000/api/v1/video/${videoId}`, { headers });
                 const result = await res.json();
@@ -62,8 +86,21 @@ export default function WatchPage({ params }: { params: { videoId: string } }) {
                 setIsLoading(false);
             }
         };
-        if (videoId) fetchVideoDetails();
-    }, [videoId]);
+        
+        if (videoId) {
+            fetchVideoDetails();
+        }
+    }, [videoId, isLoggedIn]); // Add isLoggedIn as a dependency
+
+    // Render loading/redirecting state
+    if (isLoading || isLoggedIn === null) {
+        return <div className="p-8 text-center">Loading...</div>;
+    }
+    
+    // If not logged in, the redirect will happen, but we can show a message in the meantime.
+    if (!isLoggedIn) {
+        return <div className="p-8 text-center">Redirecting to login...</div>;
+    }
 
     if (isLoading) return <div className="p-8">Loading...</div>;
     if (error) return <div className="p-8 text-red-400">Error: {error}</div>;
