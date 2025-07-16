@@ -48,9 +48,14 @@ export default function HistoryPage() {
           duration: v.duration || 0,
         }));
         setVideos(videos);
-      } catch (err: any) {
-        setError(err.message || "Failed to load watch history.");
-      } finally {
+      } catch (err: unknown) {
+  if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError('An unexpected error occurred');
+  }
+}
+ finally {
         setIsLoading(false);
       }
     };

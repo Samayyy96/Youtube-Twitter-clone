@@ -49,9 +49,14 @@ export default function SuggestedVideos({ currentVideoId, channelId }: { current
                 if (!res.ok) throw new Error("Failed to fetch suggestions");
                 const result = await res.json();
                 setAllVideos(result.data.docs || []);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
+            } catch (err: unknown) {
+  if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError('An unexpected error occurred');
+  }
+}
+ finally {
                 setIsLoading(false);
             }
         };

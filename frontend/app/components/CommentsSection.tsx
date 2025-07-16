@@ -138,9 +138,14 @@ export default function CommentsSection({ videoId }: { videoId: string }) {
             
             setComments(prev => [newlyAddedComment, ...prev]);
             setNewComment("");
-        } catch (err: any) {
-            setError("Failed to post comment: " + err.message);
-        }
+        } catch (err: unknown) {
+  if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError('An unexpected error occurred');
+  }
+}
+
     };
 
     return (

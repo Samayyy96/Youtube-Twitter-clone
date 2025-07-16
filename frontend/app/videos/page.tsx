@@ -75,9 +75,14 @@ export default function VideosPage() {
           throw new Error(result.message || 'API did not return expected data.');
         }
       
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
+      } catch (err: unknown) {
+  if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError('An unexpected error occurred');
+  }
+}
+ finally {
         setIsLoading(false);
       }
     };

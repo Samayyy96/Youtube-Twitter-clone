@@ -51,9 +51,14 @@ export default function LikedPage() {
           };
         });
         setVideos(videos);
-      } catch (err: any) {
-        setError(err.message || "Failed to load liked videos.");
-      } finally {
+      } catch (err: unknown) {
+  if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError('An unexpected error occurred');
+  }
+}
+ finally {
         setIsLoading(false);
       }
     };

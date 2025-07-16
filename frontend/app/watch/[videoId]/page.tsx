@@ -80,9 +80,14 @@ export default function WatchPage({ params }: { params: { videoId: string } }) {
                 const result = await res.json();
                 if (!res.ok) throw new Error(result.message || "Failed to load video");
                 setVideo(result.data);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
+            } catch (err: unknown) {
+  if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError('An unexpected error occurred');
+  }
+}
+ finally {
                 setIsLoading(false);
             }
         };
