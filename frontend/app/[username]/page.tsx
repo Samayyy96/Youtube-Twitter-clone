@@ -22,8 +22,13 @@ interface LoggedInUser {
     _id: string;
     username: string;
 }
+interface PageProps {
+  params: {
+    username: string;
+  };
+}
 
-export default function ChannelPage({ params }: { params: { username: string } }) {
+export default function ChannelPage({ params }: PageProps) {
     const { username } = params;
 
     // 2. Use React hooks for state management
