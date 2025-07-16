@@ -124,7 +124,7 @@ export default function MyChannelPage() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-400">You haven't uploaded any videos yet.</p>
+                    <p className="text-gray-400">You havent uploaded any videos yet.</p>
                 )}
             </div>
         </div>
