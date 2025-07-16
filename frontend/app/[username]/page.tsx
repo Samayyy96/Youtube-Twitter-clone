@@ -3,6 +3,7 @@
 'use client'; // 1. THIS IS THE MOST IMPORTANT CHANGE. It makes the page a Client Component.
 
 import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import VideoCard from '../components/VideoCard';
 import SubscribeButton from '../components/SubscribeButton';
@@ -27,9 +28,9 @@ interface PageProps {
     username: string;
   };
 }
-
-export default function ChannelPage({ params }: PageProps) {
-    const { username } = params;
+export default function ChannelPage() {
+  const params = useParams();
+  const username = params.username as string;
 
     // 2. Use React hooks for state management
     const [profile, setProfile] = useState<ChannelProfile | null>(null);
