@@ -1,14 +1,40 @@
+// app/history/page.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import VideoCard from "../components/VideoCard";
-import type { Video } from "../types";
-import {useRouter} from "next/navigation";
+import type { Video } from "../types"; // We will still use this for our final, clean data
+import { useRouter } from "next/navigation";
+
+// --- THIS IS THE FIX ---
+// 1. Define a specific type for the raw data coming from the history API endpoint.
+// This type describes the "messy" data before we clean it up.
+interface HistoryVideoFromAPI {
+    _id: string;
+    title: string;
+    thumbnail?: { url: string }; // Thumbnail might be at the top level
+    videoFile?: { url: string }; // Or it might be nested here
+    ownerDetails?: { // Sometimes owner details are already nested
+        _id: string;
+        username: string;
+        avatar?: { url: string };
+    };
+    owner?: { // And sometimes it's just 'owner'
+        _id: string;
+        username: string;
+        avatar?: { url: string };
+    };
+    views?: number;
+    createdAt: string;
+    duration?: number;
+}
+
+
 export default function HistoryPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   const router = useRouter();
 
   useEffect(() => {
@@ -18,62 +44,66 @@ export default function HistoryPage() {
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) {
-          setError("You need to sign in to access this feature ");
-          setIsLoading(false);
+          setError("You need to sign in to access this feature.");
+          // No need to set isLoading to false here, the redirect will happen
           router.push("/auth");
           return;
         }
-        const res = await fetch("http://localhost:3000/api/v1/users/history", {
+
+        const res = await fetch("http://localhost:3000/api/v1/users/watch-history", { // Corrected URL
           headers: { Authorization: `Bearer ${token}` },
         });
-        let result;
-        try {
-          result = await res.json();
-        } catch {
-          setError(
-            "The server did not return valid data. This usually means the endpoint does not exist, the backend is not running, or you are not authenticated."
-          );
-          setIsLoading(false);
-          return;
+        
+        const result = await res.json();
+        
+        if (!res.ok) {
+            throw new Error(result.message || "Failed to fetch watch history");
         }
-        if (!res.ok) throw new Error(result.message || "Failed to fetch watch history");
-        // Map backend data to Video type if needed
-        const videos = (result.data || []).map((v: any) => ({
+
+        // 2. Use our new, specific type instead of 'any'.
+        // This makes the code type-safe and removes the ESLint error.
+        const cleanedVideos: Video[] = (result.data || []).map((v: HistoryVideoFromAPI) => ({
           _id: v._id,
           title: v.title,
-          thumbnail: v.thumbnail || { url: v.videoFile?.url || "" },
-          ownerDetails: v.ownerDetails || v.owner || { _id: v.owner?._id || "", username: v.owner?.username || "", avatar: v.owner?.avatar },
+          // Safely determine the thumbnail URL
+          thumbnail: v.thumbnail || { url: v.videoFile?.url || "/default-thumbnail.png" }, 
+          // Safely determine the owner details and ensure it matches the 'Video' type
+          ownerDetails: v.ownerDetails || v.owner || { _id: "unknown", username: "Unknown User" },
           views: v.views || 0,
           createdAt: v.createdAt,
           duration: v.duration || 0,
         }));
-        setVideos(videos);
+
+        setVideos(cleanedVideos);
+
       } catch (err: unknown) {
-  if (err instanceof Error) {
-    setError(err.message);
-  } else {
-    setError('An unexpected error occurred');
-  }
-}
- finally {
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError('An unexpected error occurred');
+        }
+      } finally {
         setIsLoading(false);
       }
     };
+
     fetchHistory();
-  }, []);
+  }, [router]); // router should be in the dependency array
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <h1 className="text-2xl font-bold mb-6">Watch History</h1>
       {isLoading ? (
-        <div>Loading...</div>
+        <div className="text-center text-gray-400">Loading your history...</div>
       ) : error ? (
-        <div className="text-red-400 whitespace-pre-line">{error}</div>
+        <div className="text-red-400 text-center">{error}</div>
       ) : videos.length === 0 ? (
-        <div className="text-gray-400">No watch history found.</div>
+        <div className="text-gray-400 text-center">No watch history found.</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        // Changed to a list view which is more common for history
+        <div className="space-y-4 max-w-4xl mx-auto">
           {videos.map((video) => (
+            // A smaller card variant might be better for history, but VideoCard works
             <VideoCard key={video._id} video={video} />
           ))}
         </div>

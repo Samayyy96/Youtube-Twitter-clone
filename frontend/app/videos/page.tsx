@@ -113,7 +113,7 @@ export default function VideosPage() {
 
       {videos.length === 0 && !isLoading && (
         <p style={{ marginTop: '1rem' }}>
-          No videos found. You can upload one <a href="/upload">here</a>.
+          No videos found. You can upload one.
         </p>
       )}
     </main>
