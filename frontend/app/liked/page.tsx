@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import VideoCard from "../components/VideoCard";
 import type { Video } from "../types";
+import { useRouter } from "next/navigation";
 
 export default function LikedPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchLikedVideos = async () => {
@@ -18,6 +20,7 @@ export default function LikedPage() {
         if (!token) {
           setError("Authentication token not found. Please log in.");
           setIsLoading(false);
+          router.push("/auth");
           return;
         }
         const res = await fetch("http://localhost:3000/api/v1/likes/videos", {

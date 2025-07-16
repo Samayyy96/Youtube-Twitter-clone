@@ -99,7 +99,7 @@ export default function WatchPage({ params }: { params: { videoId: string } }) {
     
     // If not logged in, the redirect will happen, but we can show a message in the meantime.
     if (!isLoggedIn) {
-        return <div className="p-8 text-center">Redirecting to login...</div>;
+        return <div className="p-8 align-center text-xl text-center">Redirecting to login...</div>;
     }
 
     if (isLoading) return <div className="p-8">Loading...</div>;

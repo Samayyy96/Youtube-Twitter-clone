@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import VideoCard from "../components/VideoCard";
 import type { Video } from "../types";
-
+import {useRouter} from "next/navigation";
 export default function HistoryPage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -16,8 +18,9 @@ export default function HistoryPage() {
       try {
         const token = localStorage.getItem("accessToken");
         if (!token) {
-          setError("Authentication token not found. Please log in.");
+          setError("You need to sign in to access this feature ");
           setIsLoading(false);
+          router.push("/auth");
           return;
         }
         const res = await fetch("http://localhost:3000/api/v1/users/history", {
