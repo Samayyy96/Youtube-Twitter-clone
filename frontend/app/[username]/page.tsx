@@ -161,3 +161,13 @@
 //         </div>
 //     );
 // }
+
+
+
+
+export default function ChannelPage() { 
+  return (
+    <div>page</div>
+  );
+}
+
