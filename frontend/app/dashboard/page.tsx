@@ -55,11 +55,11 @@ export default function DashboardPage() {
                 setVideos(videosData.data);
 
             } catch (err: unknown) {
-  if (err instanceof Error) {
-    setError(err.message);
-  } else {
-    setError('An unexpected error occurred');
-  }
+    if (err instanceof Error) {
+        setError(err.message);
+    } else {
+        setError('An unexpected error occurred');
+    }
 }
  finally {
                 setIsLoading(false);

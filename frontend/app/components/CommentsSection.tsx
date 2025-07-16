@@ -97,8 +97,10 @@ export default function CommentsSection({ videoId }: { videoId: string }) {
                     setCurrentUser(result.data);
                 }
 
-            } catch (err: any) {
+            } catch (err: unknown) {
+               if (err instanceof Error) {
                 setError(err.message);
+               }
             } finally {
                 setIsLoading(false);
             }

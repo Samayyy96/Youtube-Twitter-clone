@@ -148,7 +148,8 @@ export default function ChannelPage({ params }: { params: { username: string } }
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-400">This channel hasn't uploaded any videos yet.</p>
+                    <p className="text-gray-400">This channel hasn&apos;t uploaded any videos yet.</p>
+
                 )}
             </div>
         </div>
