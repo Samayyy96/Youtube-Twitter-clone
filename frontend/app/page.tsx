@@ -75,7 +75,6 @@
 import { useState, useEffect } from 'react';
 import VideoCard from "./components/VideoCard";
 import type { Video } from './types'; // Make sure you have this types file
-import { useAuth } from './context/AuthContext'; // Import the auth hook
 
 export default function HomePage() {
   // 2. Use React hooks for state management, just like in your upload page.
