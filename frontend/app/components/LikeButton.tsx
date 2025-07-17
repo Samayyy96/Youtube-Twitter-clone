@@ -14,6 +14,7 @@ interface LikeButtonProps {
 
 export default function LikeButton({ videoId, initialLikesCount, initialIsLiked }: LikeButtonProps) {
   const router = useRouter();
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isLiked, setIsLiked] = useState(initialIsLiked);
@@ -33,7 +34,7 @@ export default function LikeButton({ videoId, initialLikesCount, initialIsLiked 
 
     startTransition(async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/likes/toggle/v/${videoId}`, {
+        const response = await fetch(`${serverUrl}/api/v1/likes/toggle/v/${videoId}`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

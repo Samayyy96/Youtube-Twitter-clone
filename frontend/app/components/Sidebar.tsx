@@ -32,7 +32,8 @@ const SidebarLink = ({ icon, text, href, isOpen }: { icon: React.ReactNode, text
 export default function Sidebar() {
   const { isSidebarOpen } = useAuth();
   const { isLoggedIn } = useAuth();
-
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  
 
   const [subscriptions, setSubscriptions] = useState<SubscribedChannel[]>([]);
 
@@ -52,7 +53,7 @@ export default function Sidebar() {
             // It's often better to get this from the authenticated user (`req.user._id`).
             // For now, let's assume we need to call the `/current-user` endpoint first.
             try {
-                const meResponse = await fetch('http://localhost:3000/api/v1/users/current-user', {
+                const meResponse = await fetch(`${serverUrl}/api/v1/users/current-user`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!meResponse.ok) return;
@@ -60,7 +61,7 @@ export default function Sidebar() {
                 const meData = await meResponse.json();
                 const myUserId = meData.data._id;
                 
-                const subResponse = await fetch(`http://localhost:3000/api/v1/subscriptions/u/${myUserId}`, {
+                const subResponse = await fetch(`${serverUrl}/api/v1/subscriptions/u/${myUserId}`, {
                      headers: { 'Authorization': `Bearer ${token}` }
                 });
 

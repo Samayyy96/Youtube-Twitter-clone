@@ -8,6 +8,8 @@ export default function AuthPage() {
     const { login } = useAuth(); // Get the login function from our context
     const router = useRouter();
 
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -23,7 +25,7 @@ export default function AuthPage() {
     // THE FIX IS IN THIS FUNCTION
     // ===================================
     const handleLogin = async () => {
-        const response = await fetch('http://localhost:3000/api/v1/users/login', {
+        const response = await fetch(`${serverUrl}/api/v1/users/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -54,7 +56,7 @@ export default function AuthPage() {
         if (avatar) formData.append('avatar', avatar);
         if (coverImage) formData.append('coverImage', coverImage);
         
-        const response = await fetch('http://localhost:3000/api/v1/users/register', {
+        const response = await fetch(`${serverUrl}/api/v1/users/register`, {
             method: 'POST',
             body: formData,
         });
