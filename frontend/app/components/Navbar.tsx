@@ -58,7 +58,7 @@ export default function Navbar() {
         <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-gray-700">
             <HiMenu className="text-xl" />
         </button>
-        <Link href="/" className="text-xl font-bold">MyTube</Link>
+        <Link href="/" className="text-xl font-bold">GoonTube</Link>
       </div>
 
       {/* Search Bar */}
