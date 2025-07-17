@@ -20,6 +20,7 @@ export default function Navbar() {
   
   // 1. ADD NEW STATE to hold the user's details
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 
   // 2. ADD AN EFFECT to fetch user details *only if* they are logged in
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function Navbar() {
       if (!token) return; // Should not happen if isLoggedIn is true, but good for safety
 
       try {
-        const response = await fetch('http://localhost:3000/api/v1/users/current-user', {
+        const response = await fetch(`${serverUrl}/api/v1/users/current-user`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 

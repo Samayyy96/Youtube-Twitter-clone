@@ -33,7 +33,7 @@ interface Comment {
 function CommentCard({ comment }: { comment: Comment }) {
     const avatarUrl = comment.owner?.avatar?.url || '/default-avatar.png';
     const username = comment.owner?.username || 'Unknown User';
-    
+
     return (
         <div className="flex items-start gap-3">
             <Link href={`/${username}`}>
@@ -65,7 +65,9 @@ function CommentCard({ comment }: { comment: Comment }) {
 export default function CommentsSection({ videoId }: { videoId: string }) {
     const { isLoggedIn } = useAuth();
     const router = useRouter();
-    
+
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
     const [comments, setComments] = useState<Comment[]>([]);
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
     const [newComment, setNewComment] = useState("");
@@ -81,8 +83,8 @@ export default function CommentsSection({ videoId }: { videoId: string }) {
             try {
                 const [commentsRes, currentUserRes] = await Promise.all([
                     
-                    fetch(`http://localhost:3000/api/v1/comment/${videoId}`, { headers }),
-                    isLoggedIn ? fetch('http://localhost:3000/api/v1/users/current-user', { headers }) : Promise.resolve(null)
+                    fetch(`${serverUrl}/api/v1/comment/${videoId}`, { headers }),
+                    isLoggedIn ? fetch(`${serverUrl}/api/v1/users/current-user`, { headers }) : Promise.resolve(null)
                 ]);
 
                 if (commentsRes.ok) {
@@ -118,7 +120,7 @@ export default function CommentsSection({ videoId }: { videoId: string }) {
         const token = localStorage.getItem('accessToken');
         
         try {
-            const res = await fetch(`http://localhost:3000/api/v1/comment/${videoId}`, { // Plural "comments"
+            const res = await fetch(`${serverUrl}/api/v1/comment/${videoId}`, { // Plural "comments"
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ content: newComment })
