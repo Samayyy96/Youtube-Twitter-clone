@@ -24,8 +24,6 @@ A full-stack social media application that combines features inspired by YouTube
 
 ## 📸 Screenshots
 
-<img width="344" height="826" alt="image" src="https://github.com/user-attachments/assets/a12bf79c-ee02-4201-bd22-b11811a0b515" />
-
 
 
 ## 🧪 How to Run Locally
