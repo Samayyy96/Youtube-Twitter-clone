@@ -24,39 +24,8 @@ A full-stack social media application that combines features inspired by YouTube
 
 ## 📸 Screenshots
 
-├── YOUTUBE CLONE/
-│   ├── frontend/
-│   │   ├── .next/
-│   │   ├── app/
-│   │   ├── lib/
-│   │   ├── node_modules/
-│   │   ├── public/
-│   │   ├── .env
-│   │   ├── .gitignore
-│   │   ├── eslint.config.mjs
-│   │   ├── next-env.d.ts
-│   │   ├── next.config.js
-│   │   ├── package-lock.json
-│   │   ├── package.json
-│   │   ├── postcss.config.mjs
-│   │   ├── README.md
-│   │   └── tsconfig.json
-│   ├── node_modules/
-│   ├── public/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── db/
-│   │   ├── middlewares/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── utils/
-│   │   ├── app.js
-│   │   ├── constants.js
-│   │   └── index.js
-│   ├── .env
-│   ├── .gitignore
-│   ├── .prettierignore
-│   └── .prettierrc
+<img width="344" height="826" alt="image" src="https://github.com/user-attachments/assets/a12bf79c-ee02-4201-bd22-b11811a0b515" />
+
 
 
 ## 🧪 How to Run Locally
