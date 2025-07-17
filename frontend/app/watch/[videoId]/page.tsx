@@ -31,8 +31,11 @@ interface VideoDetails {
     };
 }
 
-export default function WatchPage({ params }: { params: { videoId: string } }) {
-    const { videoId } = params;
+
+import { use } from 'react';
+
+export default function WatchPage({ params }: { params: Promise<{ videoId: string }> }) {
+  const { videoId } = use(params);
     const { isLoggedIn, closeSidebar, isSidebarOpen } = useAuth(); // 2. GET isLoggedIn FROM CONTEXT
     const router = useRouter(); // 3. INITIALIZE THE ROUTER
 

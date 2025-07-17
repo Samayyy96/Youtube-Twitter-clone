@@ -23,11 +23,6 @@ interface LoggedInUser {
     _id: string;
     username: string;
 }
-interface PageProps {
-  params: {
-    username: string;
-  };
-}
 export default function ChannelPage() {
   const params = useParams();
   const username = params.username as string;
