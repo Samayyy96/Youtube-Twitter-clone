@@ -28,9 +28,12 @@ A full-stack social media application that combines features inspired by YouTube
 
 ## 🧪 How to Run Locally
 
+### Running backend 
+
 ```bash
-# 1. Clone the repository
-git clone https://github.com/Samayyy96/Youtube-Twitter-clone.git
+
+# 1. Fork and Clone the repository
+git clone https://github.com/your_username/Youtube-Twitter-clone.git
 
 # 2. Go to the project directory
 cd Youtube-Twitter-clone
@@ -50,3 +53,22 @@ npm install
 npm run dev
 
 model link = https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj
+```
+
+### Running Frontend 
+
+```bash
+
+# 1. Go to the frontend project directory
+cd frontend
+
+:- Your path should look like this : Youtube-Twitter-clone/frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Run the development server
+npm run dev
+
+```
+
