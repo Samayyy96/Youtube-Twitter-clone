@@ -127,12 +127,12 @@ export default function WatchPage({ params }: { params: { videoId: string } }) {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-3 gap-4">
                     {/* Channel Info & Subscribe Button */}
                     <div className="flex items-center gap-3">
-                        <Link href={`/${video.owner.username}`}>
+                        <Link href="/">
                         
                             <img src={video.owner.avatar.url} alt={video.owner.fullName} className="w-10 h-10 rounded-full"/>
                         </Link>
                         <div>
-                            <Link href={`/${video.owner.username}`} className="font-semibold text-white">{video.owner.username}</Link>
+                            <Link href="/" className="font-semibold text-white">{video.owner.username}</Link>
                             <p className="text-xs text-gray-400">{formatViews(video.owner.subscribersCount)} subscribers</p>
                         </div>
                         <div className="ml-4">
