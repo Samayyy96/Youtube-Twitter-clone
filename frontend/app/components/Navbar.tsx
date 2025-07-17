@@ -8,7 +8,7 @@ import { GoPlusCircle, GoSearch } from 'react-icons/go';
 import { IoNotificationsOutline } from 'react-icons/io5';
 import { useState, useEffect } from 'react'; 
 import { HiMenu } from 'react-icons/hi';
-
+import { serverUrl } from '@/lib/constants';
 
 interface CurrentUser {
     username: string;
@@ -20,7 +20,7 @@ export default function Navbar() {
   
   // 1. ADD NEW STATE to hold the user's details
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  
 
   // 2. ADD AN EFFECT to fetch user details *only if* they are logged in
   useEffect(() => {

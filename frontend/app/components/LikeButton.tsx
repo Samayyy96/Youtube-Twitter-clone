@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ThumbsUp } from 'lucide-react';
 import { formatViews } from '@/lib/utils';
+import { serverUrl } from '@/lib/constants';
 
 interface LikeButtonProps {
   videoId: string;
@@ -14,7 +15,7 @@ interface LikeButtonProps {
 
 export default function LikeButton({ videoId, initialLikesCount, initialIsLiked }: LikeButtonProps) {
   const router = useRouter();
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  
 
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [isLiked, setIsLiked] = useState(initialIsLiked);

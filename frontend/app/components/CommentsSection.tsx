@@ -8,7 +8,7 @@ import { ThumbsUp, ThumbsDown, MoreVertical } from 'lucide-react';
 import { formatTimeAgo } from '@/lib/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import { serverUrl } from '@/lib/constants';
 // --- Define Types ---
 interface CurrentUser {
     _id: string;
@@ -66,7 +66,7 @@ export default function CommentsSection({ videoId }: { videoId: string }) {
     const { isLoggedIn } = useAuth();
     const router = useRouter();
 
-    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
 
     const [comments, setComments] = useState<Comment[]>([]);
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);

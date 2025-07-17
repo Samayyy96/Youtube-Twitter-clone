@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import VideoCard from '../components/VideoCard';
 import type { Video } from '../types';
+import { serverUrl } from '@/lib/constants';
 
 // This interface now represents the full channel profile data
 interface ChannelProfile {
@@ -37,7 +38,7 @@ export default function MyChannelPage() {
             setIsLoading(true);
             try {
                 // First, get the current user to find out their username
-                const meResponse = await fetch('http://localhost:3000/api/v1/users/current-user', {
+                const meResponse = await fetch(`${serverUrl}/api/v1/users/current-user`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!meResponse.ok) throw new Error('Could not verify your session.');
@@ -46,7 +47,7 @@ export default function MyChannelPage() {
                 const myUserId = meData.data._id;
                 
                 // Now, fetch the full public channel profile data for ourselves
-                const profileResponse = await fetch(`http://localhost:3000/api/v1/users/c/${myUsername}`, {
+                const profileResponse = await fetch(`${serverUrl}/api/v1/users/c/${myUsername}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!profileResponse.ok) throw new Error('Failed to fetch your channel profile.');
@@ -54,7 +55,7 @@ export default function MyChannelPage() {
                 setProfile(profileData.data);
 
                 // Finally, fetch our own videos using our user ID
-                const videosResponse = await fetch(`http://localhost:3000/api/v1/video/?userId=${myUserId}`, {
+                const videosResponse = await fetch(`${serverUrl}/api/v1/video/?userId=${myUserId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!videosResponse.ok) throw new Error('Failed to fetch your videos.');

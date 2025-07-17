@@ -10,7 +10,7 @@ import SubscribeButton from '@/app/components/SubscribeButton';
 import CommentsSection from '@/app/components/CommentsSection';
 import SuggestedVideos from '@/app/components/SuggestedVideos';
 import LikeButton from '@/app/components/LikeButton';
-
+import { serverUrl } from '@/lib/constants';
 // Define the shape of the detailed video data
 interface VideoDetails {
     _id: string;
@@ -79,7 +79,7 @@ export default function WatchPage({ params }: { params: Promise<{ videoId: strin
             const headers: HeadersInit = { 'Authorization': `Bearer ${token}` };
             
             try {
-                const res = await fetch(`http://localhost:3000/api/v1/video/${videoId}`, { headers });
+                const res = await fetch(`${serverUrl}/api/v1/video/${videoId}`, { headers });
                 const result = await res.json();
                 if (!res.ok) throw new Error(result.message || "Failed to load video");
                 setVideo(result.data);

@@ -4,7 +4,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
+import { serverUrl } from '@/lib/constants';
 // =================================================================
 // Keep your TypeScript interfaces as they are.
 // =================================================================
@@ -50,7 +50,7 @@ export default function VideosPage() {
         return;
       }
       
-      const apiUrl = "http://localhost:3000/api/v1/video/";
+      const apiUrl = `${serverUrl}/api/v1/video/`;
 
       try {
         // 5. Make the fetch call WITH the Authorization header.

@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import type { Video } from '../types'; // Assuming this is your shared video type
 import { formatDuration, formatTimeAgo } from '@/lib/utils';
+import { serverUrl } from '@/lib/constants';
 
 // A smaller, dedicated component for a single suggestion item
 function SuggestionCard({ video }: { video: Video }) {
@@ -45,7 +46,7 @@ export default function SuggestedVideos({ currentVideoId, channelId }: { current
             setIsLoading(true);
             try {
                 // Fetch a general list of public videos
-                const res = await fetch('http://localhost:3000/api/v1/video/');
+                const res = await fetch(`${serverUrl}/api/v1/video/`);
                 if (!res.ok) throw new Error("Failed to fetch suggestions");
                 const result = await res.json();
                 setAllVideos(result.data.docs || []);

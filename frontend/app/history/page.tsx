@@ -4,23 +4,22 @@
 
 import { useEffect, useState } from "react";
 import VideoCard from "../components/VideoCard";
-import type { Video } from "../types"; // We will still use this for our final, clean data
+import type { Video } from "../types"; 
 import { useRouter } from "next/navigation";
+import { serverUrl } from '@/lib/constants';
 
-// --- THIS IS THE FIX ---
-// 1. Define a specific type for the raw data coming from the history API endpoint.
-// This type describes the "messy" data before we clean it up.
+
 interface HistoryVideoFromAPI {
     _id: string;
     title: string;
-    thumbnail?: { url: string }; // Thumbnail might be at the top level
-    videoFile?: { url: string }; // Or it might be nested here
-    ownerDetails?: { // Sometimes owner details are already nested
+    thumbnail?: { url: string }; 
+    videoFile?: { url: string }; 
+    ownerDetails?: { 
         _id: string;
         username: string;
         avatar?: { url: string };
     };
-    owner?: { // And sometimes it's just 'owner'
+    owner?: { 
         _id: string;
         username: string;
         avatar?: { url: string };
@@ -45,12 +44,12 @@ export default function HistoryPage() {
         const token = localStorage.getItem("accessToken");
         if (!token) {
           setError("You need to sign in to access this feature.");
-          // No need to set isLoading to false here, the redirect will happen
+          
           router.push("/auth");
           return;
         }
 
-        const res = await fetch("http://localhost:3000/api/v1/users/watch-history", { // Corrected URL
+        const res = await fetch(`${serverUrl}/api/v1/users/watch-history`, { 
           headers: { Authorization: `Bearer ${token}` },
         });
         

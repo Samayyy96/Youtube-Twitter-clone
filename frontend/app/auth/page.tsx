@@ -3,12 +3,13 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { serverUrl } from '@/lib/constants';
 
 export default function AuthPage() {
     const { login } = useAuth(); // Get the login function from our context
     const router = useRouter();
 
-    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+
 
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState('');

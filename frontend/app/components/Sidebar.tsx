@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { GoHome, GoVideo } from 'react-icons/go';
 import { MdSubscriptions, MdOutlineHistory, MdOutlineWatchLater, MdOutlineThumbUp } from 'react-icons/md';
+import { serverUrl } from '@/lib/constants';
 
 // Define a type for the subscribed channel data we expect from the API
 interface SubscribedChannel {
@@ -32,7 +33,7 @@ const SidebarLink = ({ icon, text, href, isOpen }: { icon: React.ReactNode, text
 export default function Sidebar() {
   const { isSidebarOpen } = useAuth();
   const { isLoggedIn } = useAuth();
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+  
   
 
   const [subscriptions, setSubscriptions] = useState<SubscribedChannel[]>([]);

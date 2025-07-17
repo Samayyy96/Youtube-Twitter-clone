@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { Video } from "../types";
 import { useState, useEffect } from "react"; // Import hooks
 import { formatTimeAgo, formatDuration } from "@/lib/utils";
+import { serverUrl } from '@/lib/constants';
 
 export default function VideoCard({ video }: { video: Video }) {
   // State to hold the ID of the currently logged-in user
@@ -24,7 +25,7 @@ export default function VideoCard({ video }: { video: Video }) {
       try {
         // Fetch the current user details from the backend
         const response = await fetch(
-          "http://localhost:3000/api/v1/users/current-user",
+          `${serverUrl}/api/v1/users/current-user`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },

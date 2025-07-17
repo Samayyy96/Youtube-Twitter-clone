@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IoMdNotificationsOutline } from 'react-icons/io';
+import { serverUrl } from '@/lib/constants';
 
 interface SubscribeButtonProps {
     channelId: string;
@@ -25,7 +26,7 @@ export default function SubscribeButton({ channelId, initialSubscribedStatus }: 
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/v1/subscriptions/c/${channelId}`, {
+            const response = await fetch(`${serverUrl}/api/v1/subscriptions/c/${channelId}`, {
                 method: 'POST', // Assuming your toggle is a POST request
                 headers: { 'Authorization': `Bearer ${token}` }
             });

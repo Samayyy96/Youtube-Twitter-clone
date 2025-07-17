@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import VideoCard from "../components/VideoCard";
 import type { Video } from "../types"; // Using the final, clean Video type
 import { useRouter } from "next/navigation";
+import { serverUrl } from '@/lib/constants';
 
 // --- THIS IS THE FIX ---
 // 1. Define a specific type for the raw data from the '/likes/videos' API.
@@ -46,7 +47,7 @@ export default function LikedVideosPage() { // Renamed component for clarity
           return;
         }
 
-        const res = await fetch("http://localhost:3000/api/v1/likes/videos", {
+        const res = await fetch(`${serverUrl}/api/v1/likes/videos`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

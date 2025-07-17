@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { serverUrl } from '@/lib/constants';
 
 // Define shapes for the data we'll fetch
 interface ChannelStats {
@@ -40,8 +41,8 @@ export default function DashboardPage() {
             setIsLoading(true);
             try {
                 const [statsRes, videosRes] = await Promise.all([
-                    fetch('http://localhost:3000/api/v1/dashboard/stats', { headers: { 'Authorization': `Bearer ${token}` } }),
-                    fetch('http://localhost:3000/api/v1/dashboard/videos', { headers: { 'Authorization': `Bearer ${token}` } })
+                    fetch(`${serverUrl}/api/v1/dashboard/stats`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${serverUrl}/api/v1/dashboard/videos`, { headers: { 'Authorization': `Bearer ${token}` } })
                 ]);
 
                 if (!statsRes.ok || !videosRes.ok) {

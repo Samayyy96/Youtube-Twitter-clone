@@ -4,6 +4,7 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext'; // 1. IMPORT THE AUTH HOOK
+import { serverUrl } from '@/lib/constants';
 
 export default function UploadVideoPage() {
     const { isLoggedIn } = useAuth(); // 2. GET THE LOGGED-IN STATE
@@ -58,7 +59,7 @@ export default function UploadVideoPage() {
         formData.append('thumbnail', thumbnailFile);
 
         try {
-            const response = await fetch('http://localhost:3000/api/v1/video/', {
+            const response = await fetch(`${serverUrl}/api/v1/video/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
