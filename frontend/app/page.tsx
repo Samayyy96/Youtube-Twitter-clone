@@ -75,7 +75,7 @@
 import { useState, useEffect } from 'react';
 import VideoCard from "./components/VideoCard";
 import type { Video } from './types'; // Make sure you have this types file
-
+import {serverUrl} from '@/lib/constants'; 
 export default function HomePage() {
   // 2. Use React hooks for state management, just like in your upload page.
   const [videos, setVideos] = useState<Video[]>([]);
@@ -97,7 +97,7 @@ export default function HomePage() {
 
       try {
         // 5. Make the fetch call WITH the Authorization header.
-        const response = await fetch('http://localhost:3000/api/v1/video/', {
+        const response = await fetch(`${serverUrl}/api/v1/video/`, {
           
         });
 
