@@ -90,18 +90,24 @@
 // // It converts this page from a Server Component to a Client Component.
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import VideoCard from "./components/VideoCard";
 import VideoSkeleton from "./components/ui/VideoSkeleton"; // Import the skeleton
 import type { Video } from './types'; 
 import { serverUrl } from '@/lib/constants'; 
 import TagsBar from "./components/TagsBar";
+import {useAuth} from './context/AuthContext';
 
 export default function HomePage() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const { toggleSidebar } = useAuth(); 
+
+  useEffect(() => {
+    toggleSidebar(); // Ensure sidebar is always open when this page loads
+  },[]);
+
   useEffect(() => {
     const fetchVideos = async () => {
       setIsLoading(true);

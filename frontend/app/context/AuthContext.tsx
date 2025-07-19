@@ -3,7 +3,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-//this also contains the shared state for sidebar toggle
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -55,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = '/'; 
   };
 
-  const toggleSidebar = () => {
+  const toggleSidebar = () => {      
     if (completeClose) {
       setCompleteClose(false);
       setIsSidebarOpen(true);
