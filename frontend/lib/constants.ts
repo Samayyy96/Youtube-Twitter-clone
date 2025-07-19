@@ -1,1 +1,1 @@
-export const serverUrl = "https://goontube.onrender.com";
+export const serverUrl = "http://localhost:3000";
