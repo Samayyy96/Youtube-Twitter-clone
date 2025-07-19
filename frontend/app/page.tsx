@@ -90,7 +90,7 @@
 // // It converts this page from a Server Component to a Client Component.
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect} from 'react';
 import VideoCard from "./components/VideoCard";
 import VideoSkeleton from "./components/ui/VideoSkeleton"; // Import the skeleton
 import type { Video } from './types'; 
