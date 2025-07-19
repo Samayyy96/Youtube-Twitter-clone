@@ -7,6 +7,7 @@ import type { Video } from "../types";
 import { useState, useEffect } from "react"; // Import hooks
 import { formatTimeAgo, formatDuration } from "@/lib/utils";
 import { serverUrl } from '@/lib/constants';
+import Image from "next/image";
 
 export default function VideoCard({ video }: { video: Video }) {
   // State to hold the ID of the currently logged-in user
@@ -58,9 +59,11 @@ export default function VideoCard({ video }: { video: Video }) {
       <Link href={`/watch/${video._id}`}>
         <div className="relative aspect-video w-full">
           {/* We are still using the regular <img> tag to avoid next.config issues */}
-          <img
+          <Image
             src={video.thumbnail.url}
             alt={video.title}
+            width={600}
+            height={400}
             className="rounded-xl object-cover w-full h-full group-hover:rounded-none transition-all duration-200"
           />
           <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-xs font-semibold px-1.5 py-0.5 rounded">

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { useRouter } from 'next/navigation'; // 1. IMPORT THE ROUTER
+import { useRouter } from 'next/navigation'; 
 import Link from 'next/link';
 import { formatTimeAgo, formatViews } from '@/lib/utils';
 import { ThumbsDown, Share, Download, MoreHorizontal } from 'lucide-react';
@@ -11,7 +11,10 @@ import CommentsSection from '@/app/components/CommentsSection';
 import SuggestedVideos from '@/app/components/SuggestedVideos';
 import LikeButton from '@/app/components/LikeButton';
 import { serverUrl } from '@/lib/constants';
-// Define the shape of the detailed video data
+import { usePathname } from 'next/navigation';
+import { use } from 'react';
+
+
 interface VideoDetails {
     _id: string;
     title: string;
@@ -32,33 +35,35 @@ interface VideoDetails {
 }
 
 
-import { use } from 'react';
-
 export default function WatchPage({ params }: { params: Promise<{ videoId: string }> }) {
-  const { videoId } = use(params);
-    const { isLoggedIn, closeSidebar, isSidebarOpen } = useAuth(); // 2. GET isLoggedIn FROM CONTEXT
-    const router = useRouter(); // 3. INITIALIZE THE ROUTER
+    const { videoId } = use(params);
+    const { isLoggedIn, closeSidebar, isSidebarOpen } = useAuth(); 
+    const router = useRouter(); 
+    const path = usePathname();
 
     const [video, setVideo] = useState<VideoDetails | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showFullDescription, setShowFullDescription] = useState(false);
 
-    // 4. ADD useEffect TO CHECK AUTH STATUS AND REDIRECT
     useEffect(() => {
-        // The AuthProvider sets isLoggedIn after checking the token.
-        // If it's explicitly false, the user is not logged in.
+        
         if (isLoggedIn === false) {
             router.push('/auth');
         }
     }, [isLoggedIn, router]);
 
-    // This effect for collapsing the sidebar remains the same
     useEffect(() => {
-        if (isSidebarOpen) closeSidebar();
-    }, [isSidebarOpen, closeSidebar]);
+  const currentPath = path; // snapshot path
+  if (currentPath?.startsWith('/watch')) {
+    closeSidebar();
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
-    // This effect for fetching data now depends on isLoggedIn
+
+
+
     useEffect(() => {
         // Don't bother fetching if we know the user is not logged in.
         if (!isLoggedIn) {

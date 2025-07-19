@@ -3,10 +3,9 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
+        protocol: 'http',
         hostname: 'res.cloudinary.com',
-        port: '3001',
-        pathname: 'samay928', // Your cloud name here
+        pathname: '/samay928/**', 
       },
     ],
   },

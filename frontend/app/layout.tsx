@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description: 'A modern video sharing platform',
 };
 
+
 export default function RootLayout({
   children,
 }: {
@@ -26,7 +27,7 @@ export default function RootLayout({
             <Navbar />
             <div className="flex flex-1 overflow-hidden">
               {/* Sidebar is also at this level */}
-              <Sidebar />
+              {/* <Sidebar /> */}
               {/* MainContent is a new client component that handles the dynamic margin */}
               <MainContent>
                 {children}
