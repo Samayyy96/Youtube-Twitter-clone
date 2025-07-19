@@ -37,7 +37,7 @@ interface VideoDetails {
 
 export default function WatchPage({ params }: { params: Promise<{ videoId: string }> }) {
     const { videoId } = use(params);
-    const { isLoggedIn, closeSidebar, isSidebarOpen } = useAuth(); 
+    const { isLoggedIn, closeSidebar } = useAuth(); 
     const router = useRouter(); 
     const path = usePathname();
 
