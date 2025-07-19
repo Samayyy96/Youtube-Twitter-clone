@@ -3,7 +3,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
 import { AuthProvider } from './context/AuthContext';
 import MainContent from './components/MainContent'; // We'll create this new component
 
