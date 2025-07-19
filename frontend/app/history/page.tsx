@@ -1,4 +1,3 @@
-// app/history/page.tsx
 
 "use client";
 
@@ -7,7 +6,6 @@ import VideoCard from "../components/VideoCard";
 import type { Video } from "../types"; 
 import { useRouter } from "next/navigation";
 import { serverUrl } from '@/lib/constants';
-
 
 interface HistoryVideoFromAPI {
     _id: string;
@@ -49,7 +47,7 @@ export default function HistoryPage() {
           return;
         }
 
-        const res = await fetch(`${serverUrl}/api/v1/users/watch-history`, { 
+        const res = await fetch(`${serverUrl}/api/v1/users/history`, { 
           headers: { Authorization: `Bearer ${token}` },
         });
         
@@ -59,8 +57,7 @@ export default function HistoryPage() {
             throw new Error(result.message || "Failed to fetch watch history");
         }
 
-        // 2. Use our new, specific type instead of 'any'.
-        // This makes the code type-safe and removes the ESLint error.
+        
         const cleanedVideos: Video[] = (result.data || []).map((v: HistoryVideoFromAPI) => ({
           _id: v._id,
           title: v.title,
@@ -90,19 +87,17 @@ export default function HistoryPage() {
   }, [router]); // router should be in the dependency array
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Watch History</h1>
       {isLoading ? (
-        <div className="text-center text-gray-400">Loading your history...</div>
+        <div>Loading...</div>
       ) : error ? (
-        <div className="text-red-400 text-center">{error}</div>
+        <div className="text-red-400 whitespace-pre-line">{error}</div>
       ) : videos.length === 0 ? (
-        <div className="text-gray-400 text-center">No watch history found.</div>
+        <div className="text-gray-400">No watch history found.</div>
       ) : (
-        // Changed to a list view which is more common for history
-        <div className="space-y-4 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {videos.map((video) => (
-            // A smaller card variant might be better for history, but VideoCard works
             <VideoCard key={video._id} video={video} />
           ))}
         </div>
