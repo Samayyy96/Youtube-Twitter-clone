@@ -84,7 +84,7 @@ export default function AuthPage() {
             }
         } catch (err: unknown) {
   if (err instanceof Error) {
-    setError(err.message);
+    setError("Either the email or password is incorrect. Please try again.");
   } else {
     setError('An unexpected error occurred');
   }
