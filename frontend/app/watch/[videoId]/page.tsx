@@ -13,6 +13,7 @@ import LikeButton from "@/app/components/LikeButton";
 import DislikeButton from "@/app/components/DislikeButton";
 import { serverUrl } from "@/lib/constants";
 import { usePathname } from "next/navigation";
+import { use } from "react";
 
 interface VideoDetails {
   _id: string;
@@ -38,9 +39,9 @@ interface VideoDetails {
 export default function WatchPage({
   params,
 }: {
-  params: { videoId: string };
+  params: Promise<{ videoId: string }>;
 }) {
-  const { videoId } = params;
+  const { videoId } = use(params);
   const { isLoggedIn, closeSidebar } = useAuth();
   const router = useRouter();
   const path = usePathname();
