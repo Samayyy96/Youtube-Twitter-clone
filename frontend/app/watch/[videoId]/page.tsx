@@ -10,6 +10,7 @@ import SubscribeButton from "@/app/components/SubscribeButton";
 import CommentsSection from "@/app/components/CommentsSection";
 import SuggestedVideos from "@/app/components/SuggestedVideos";
 import LikeButton from "@/app/components/LikeButton";
+import DislikeButton from "@/app/components/DislikeButton";
 import { serverUrl } from "@/lib/constants";
 import { usePathname } from "next/navigation";
 import { use } from "react";
@@ -23,6 +24,8 @@ interface VideoDetails {
   createdAt: string;
   likesCount: number;
   isLiked: boolean;
+  dislikesCount: number; // <-- add this
+  isDisliked: boolean;   // <-- add this
   owner: {
     _id: string;
     username: string;
@@ -47,6 +50,11 @@ export default function WatchPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  // Add local state for like/dislike
+  const [likesCount, setLikesCount] = useState<number>(0);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [dislikesCount, setDislikesCount] = useState<number>(0);
+  const [isDisliked, setIsDisliked] = useState<boolean>(false);
 
   useEffect(() => {
     if (isLoggedIn === false) {
@@ -103,6 +111,93 @@ export default function WatchPage({
       fetchVideoDetails();
     }
   }, [videoId, isLoggedIn]); // Add isLoggedIn as a dependency
+
+  // Sync local like/dislike state with fetched video
+  useEffect(() => {
+    if (video) {
+      setLikesCount(video.likesCount);
+      setIsLiked(video.isLiked);
+      setDislikesCount(video.dislikesCount);
+      setIsDisliked(video.isDisliked);
+    }
+  }, [video]);
+
+  // Like/Dislike handlers
+  const handleLike = async () => {
+    if (isLoading || !video) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      router.push("/auth");
+      return;
+    }
+    if (isLiked) {
+      setIsLiked(false);
+      setLikesCount((prev) => (prev > 0 ? prev - 1 : 0));
+      try {
+        await fetch(`${serverUrl}/api/v1/likes/toggle/v/${video._id}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {}
+      return;
+    }
+    setIsLiked(true);
+    setLikesCount((prev) => prev + 1);
+    if (isDisliked) {
+      setIsDisliked(false);
+      setDislikesCount((prev) => (prev > 0 ? prev - 1 : 0));
+    }
+    try {
+      await fetch(`${serverUrl}/api/v1/likes/toggle/v/${video._id}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (isDisliked) {
+        await fetch(`${serverUrl}/api/v1/dislikes/toggle/v/${video._id}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch {}
+  };
+
+  const handleDislike = async () => {
+    if (isLoading || !video) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      router.push("/auth");
+      return;
+    }
+    if (isDisliked) {
+      setIsDisliked(false);
+      setDislikesCount((prev) => (prev > 0 ? prev - 1 : 0));
+      try {
+        await fetch(`${serverUrl}/api/v1/dislikes/toggle/v/${video._id}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {}
+      return;
+    }
+    setIsDisliked(true);
+    setDislikesCount((prev) => prev + 1);
+    if (isLiked) {
+      setIsLiked(false);
+      setLikesCount((prev) => (prev > 0 ? prev - 1 : 0));
+    }
+    try {
+      await fetch(`${serverUrl}/api/v1/dislikes/toggle/v/${video._id}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (isLiked) {
+        await fetch(`${serverUrl}/api/v1/likes/toggle/v/${video._id}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch {}
+  };
 
   // Render loading/redirecting state
   if (isLoading || isLoggedIn === null) {
@@ -172,13 +267,21 @@ export default function WatchPage({
             <div className="flex items-center bg-gray-800 rounded-full">
               <LikeButton
                 videoId={video._id}
-                initialLikesCount={video.likesCount}
-                initialIsLiked={video.isLiked}
+                initialLikesCount={likesCount}
+                initialIsLiked={isLiked}
+                isDisliked={isDisliked}
+                disabled={isLoading}
+                onClick={handleLike}
               />
               <div className="border-l border-gray-600 h-6 my-1"></div>
-              <button className="px-4 py-2 hover:bg-gray-700 rounded-r-full">
-                <ThumbsDown size={16} />
-              </button>
+              <DislikeButton
+                videoId={video._id}
+                initialDislikesCount={dislikesCount}
+                initialIsDisliked={isDisliked}
+                isLiked={isLiked}
+                disabled={isLoading}
+                onClick={handleDislike}
+              />
             </div>
             <button className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-full text-sm font-semibold">
               <Share size={16} /> Share
