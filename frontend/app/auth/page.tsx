@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { serverUrl } from '@/lib/constants';
 
+import GoogleLoginButton from '../components/GoogleLoginButton'; 
+
 export default function AuthPage() {
-    const { login } = useAuth(); // Get the login function from our context
+    const { login } = useAuth();
     const router = useRouter();
-
-
 
     const [isLoginMode, setIsLoginMode] = useState(true);
     const [email, setEmail] = useState('');
@@ -22,9 +22,8 @@ export default function AuthPage() {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // ===================================
-    // THE FIX IS IN THIS FUNCTION
-    // ===================================
+    // No changes are needed in your existing handleLogin, handleSignup,
+    // or handleSubmit functions. They will continue to work perfectly for the manual forms.
     const handleLogin = async () => {
         const response = await fetch(`${serverUrl}/api/v1/users/login`, {
             method: 'POST',
@@ -36,15 +35,8 @@ export default function AuthPage() {
             throw new Error(result.message || 'Login failed.');
         }
         
-        // 1. Get the accessToken from the JSON response body.
         const token = result.data.accessToken;
-
-        // 2. Call our context's login function. This will:
-        //    a) Save the token to localStorage.
-        //    b) Update the global state to isLoggedIn = true.
         login(token); 
-        
-        // 3. Redirect the user.
         router.push('/');
     };
 
@@ -83,13 +75,12 @@ export default function AuthPage() {
                 await handleSignup();
             }
         } catch (err: unknown) {
-  if (err instanceof Error) {
-    setError("Either the email or password is incorrect. Please try again.");
-  } else {
-    setError('An unexpected error occurred');
-  }
-}
- finally {
+            if (err instanceof Error) {
+                setError("Either the email or password is incorrect. Please try again.");
+            } else {
+                setError('An unexpected error occurred');
+            }
+        } finally {
             setIsLoading(false);
         }
     };
@@ -100,10 +91,11 @@ export default function AuthPage() {
         setSuccessMessage(null);
     }
     
-    // The JSX with autocomplete attributes remains the same
     return (
-        <div className="max-w-md mx-auto mt-12 p-8 border border-gray-700 rounded-lg bg-gray-900">
+        <div className="max-w-md mx-auto mt-12 p-8 border border-gray-700 rounded-lg bg-gray-900 text-white">
             <h1 className="text-2xl font-bold text-center mb-6">{isLoginMode ? 'Login to Your Account' : 'Create an Account'}</h1>
+            
+            {/* Manual Login/Signup Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
                 {!isLoginMode && (
                     <>
@@ -129,11 +121,11 @@ export default function AuthPage() {
                     <>
                         <div>
                             <label className="text-sm font-medium">Avatar (Required)</label>
-                            <input type="file" accept="image/*" onChange={(e) => setAvatar(e.target.files?.[0] || null)} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required />
+                            <input type="file" accept="image/*" onChange={(e) => setAvatar(e.target.files?.[0] || null)} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-gray-700 text-gray-300 hover:file:bg-gray-600" required />
                         </div>
                         <div>
                             <label className="text-sm font-medium">Cover Image (Optional)</label>
-                            <input type="file" accept="image/*" onChange={(e) => setCoverImage(e.target.files?.[0] || null)} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                            <input type="file" accept="image/*" onChange={(e) => setCoverImage(e.target.files?.[0] || null)} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-gray-700 text-gray-300 hover:file:bg-gray-600" />
                         </div>
                     </>
                 )}
@@ -141,8 +133,23 @@ export default function AuthPage() {
                     {isLoading ? 'Processing...' : (isLoginMode ? 'Login' : 'Create Account')}
                 </button>
             </form>
+
+            {/* 2. Add a visual separator and the Google button */}
+            <div className="my-6 flex items-center">
+                <div className="flex-grow border-t border-gray-600"></div>
+                <span className="mx-4 text-xs font-semibold text-gray-400">OR</span>
+                <div className="flex-grow border-t border-gray-600"></div>
+            </div>
+
+            <div className="w-full">
+                <GoogleLoginButton />
+            </div>
+
+            {/* Error and Success Messages */}
             {error && <p className="mt-4 text-center text-sm text-red-400 bg-red-900/50 p-3 rounded">{error}</p>}
             {successMessage && <p className="mt-4 text-center text-sm text-green-400 bg-green-900/50 p-3 rounded">{successMessage}</p>}
+            
+            {/* Toggle between Login and Signup modes */}
             <p className="mt-6 text-center text-sm text-gray-400">
                 {isLoginMode ? "Don't have an account?" : "Already have an account?"}
                 <button onClick={toggleMode} className="ml-1 font-semibold text-blue-400 hover:underline">

@@ -487,9 +487,51 @@ const getWatchHistory = asyncHandler(async(req, res) => {
 })
 
 
+const googleLoginCallback = asyncHandler(async (req, res) => {
+    if (!req.user) {
+        throw new apierrors(401, "User not authenticated by Google.");
+    }
+    // THE ONLY CHANGE IS THIS LINE: Redirect to the homepage with a query parameter.
+    return res.redirect(`${process.env.FRONTEND_URL}/?google_auth=pending`);
+});
+
+// Controller 2: Called by our frontend callback page.
+// It generates our JWTs and sends the access token in the response.
+const finalizeGoogleLogin = asyncHandler(async (req, res) => {
+    // Because of the active session, Passport's `req.user` is available.
+    if (!req.user) {
+        throw new apierrors(401, "User session not found. Please try logging in again.");
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(req.user._id);
+    const loggedInUser = await User.findById(req.user._id).select("-password -refreshToken");
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+    };
+
+    // Respond with the accessToken and user data in the JSON body for localStorage.
+    // Set the long-lived refreshToken as a secure, httpOnly cookie.
+    return res
+        .status(200)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    user: loggedInUser,
+                    accessToken: accessToken,
+                },
+                "User logged in successfully"
+            )
+        );
+});
+
 
 
 export { 
+
     registerUser,
     loginUser,
     logoutuser,
@@ -500,5 +542,7 @@ export {
     updateUserCoverImage,
     updateUserAvatar,
     getUserChannelProfile,
-    getWatchHistory
+    getWatchHistory,
+    googleLoginCallback,
+    finalizeGoogleLogin
  }

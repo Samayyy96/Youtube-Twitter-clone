@@ -3,8 +3,7 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 
 
-// Fix : the user model saves the avatr and coverimage as a string and not as a url so we need to fix it 
-// and keep it same as how video model saves it
+
 
 const userSchema = new Schema(
     {
@@ -50,7 +49,16 @@ const userSchema = new Schema(
         ],
         password: {
             type: String,
-            required: [true, 'Password is required']
+            // required: [true, 'Password is required']
+            required: [
+                function() { return !this.googleId; },
+                'Password is required'
+            ],
+        },
+        googleId: {
+            type: String,
+            unique: true,
+            sparse: true // Ensures uniqueness but allows null values
         },
         refreshToken: {
             type: String
@@ -70,6 +78,7 @@ userSchema.pre("save", async function (next) {
 })
 
 userSchema.methods.isPasswordCorrect = async function(password){
+    if (!this.password) return false;
     return await bcrypt.compare(password, this.password)
 }
 

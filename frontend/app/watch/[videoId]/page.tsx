@@ -25,7 +25,7 @@ interface VideoDetails {
   likesCount: number;
   isLiked: boolean;
   dislikesCount: number; // <-- add this
-  isDisliked: boolean;   // <-- add this
+  isDisliked: boolean; // <-- add this
   owner: {
     _id: string;
     username: string;

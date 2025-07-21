@@ -81,7 +81,7 @@ export default function Sidebar() {
   return (
     // The sidebar changes its width and position based on the state
     <aside 
-        className={`fixed top-0 left-0 h-screen bg-[#0F0F0F] p-2 flex-col border-r border-gray-800 transition-all duration-300 hidden md:flex 
+        className={`fixed top-0 left-0 h-screen bg-[#0F0F0F] p-2 flex-col  transition-all duration-300 hidden md:flex 
         ${isSidebarOpen ? 'w-60' : 'w-20'}`}
     >
       <div className="space-y-1 mt-16">

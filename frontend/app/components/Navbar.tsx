@@ -1,14 +1,14 @@
 // app/components/Navbar.tsx
 
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useAuth } from "../context/AuthContext";
-import { GoPlusCircle, GoSearch } from "react-icons/go";
-import { IoNotificationsOutline } from "react-icons/io5";
-import { useState, useEffect } from "react";
-import { HiMenu } from "react-icons/hi";
-import { serverUrl } from "@/lib/constants";
+import Link from 'next/link';
+import { useAuth } from '../context/AuthContext';
+import { GoPlusCircle, GoSearch } from 'react-icons/go';
+import { IoNotificationsOutline } from 'react-icons/io5';
+import { useState, useEffect } from 'react';
+import { HiMenu } from 'react-icons/hi';
+import { serverUrl } from '@/lib/constants';
 
 interface CurrentUser {
   username: string;
@@ -18,8 +18,6 @@ interface CurrentUser {
 export default function Navbar() {
   const { isLoggedIn, logout, toggleSidebar } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
-
-  // 1. ADD NEW STATE to hold the user's details
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   useEffect(() => {
@@ -28,22 +26,21 @@ export default function Navbar() {
     };
 
     checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // 2. ADD AN EFFECT to fetch user details *only if* they are logged in
+  // This effect correctly fetches user details when the login state changes.
+  // No changes are needed here.
   useEffect(() => {
-    // If the user is not logged in, there's nothing to fetch.
     if (!isLoggedIn) {
-      setCurrentUser(null); // Clear any previous user data
+      setCurrentUser(null);
       return;
     }
 
-    // Define the async function to fetch the user
     const fetchUserDetails = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return; // Should not happen if isLoggedIn is true, but good for safety
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
 
       try {
         const response = await fetch(`${serverUrl}/api/v1/users/current-user`, {
@@ -53,17 +50,22 @@ export default function Navbar() {
         if (response.ok) {
           const result = await response.json();
           setCurrentUser(result.data);
+        } else {
+          // If the token is invalid (e.g., expired), log the user out
+          console.error('Navbar: Invalid token. Logging out.');
+          logout();
         }
       } catch (error) {
-        console.error("Navbar: Failed to fetch user details", error);
+        console.error('Navbar: Failed to fetch user details', error);
       }
     };
 
     fetchUserDetails();
-  }, [isLoggedIn]); // This effect re-runs whenever the login state changes
+  }, [isLoggedIn, logout]);
 
   return (
-    <nav className="sticky top-0 z-50 flex items-center justify-between px-4 py-2 bg-[#0F0F0F] border-b border-gray-800">
+    <nav className="sticky top-0 z-50 flex items-center justify-between px-4 py-2 bg-[#0F0F0F]  text-white">
+      {/* --- DESKTOP VIEW --- */}
       {!isMobile && (
         <>
           <div className="flex items-center gap-4">
@@ -78,23 +80,20 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Search Bar */}
-          <div className="flex-grow max-w-2xl hidden sm:flex">
+          <div className="flex-grow max-w-2xl flex">
             <input
               type="text"
               placeholder="Search"
-              className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-l-full focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2 text-white bg-gray-900 border border-gray-700 rounded-l-full focus:outline-none focus:border-blue-500"
             />
             <button className="px-5 py-2 bg-gray-800 border border-gray-700 border-l-0 rounded-r-full hover:bg-gray-700">
               <GoSearch />
             </button>
           </div>
 
-          {/* Right Side - Actions */}
           <div className="flex items-center gap-4">
-            {/* We still use isLoggedIn from context to decide which block to show */}
             {isLoggedIn && currentUser ? (
-              // 3. UI FOR LOGGED-IN USERS (now uses 'currentUser' state)
+              // --- LOGGED-IN VIEW (Desktop) ---
               <>
                 <Link
                   href="/upload"
@@ -110,72 +109,114 @@ export default function Navbar() {
                   <IoNotificationsOutline className="text-2xl" />
                 </button>
 
-                {/* --- THIS IS THE FIX --- */}
-                <Link
-                  href="/profile"
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-700"
-                  title="My Profile"
-                >
-                  {currentUser.avatar?.url ? (
-                    <img
-                      src={currentUser.avatar.url}
-                      alt={currentUser.username}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    // Fallback to the first initial if no avatar
-                    <span className="font-bold text-white text-lg">
-                      {currentUser.username.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </Link>
-
-                <button
-                  onClick={logout}
-                  className="ml-2 text-sm text-gray-400 hover:text-white"
-                >
-                  Logout
-                </button>
+                <div className="group relative">
+                  <Link
+                    href={`/profile`}
+                    className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-700"
+                    title="My Channel"
+                  >
+                    {currentUser.avatar?.url ? (
+                      <img
+                        src={currentUser.avatar.url}
+                        alt={currentUser.username}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="font-bold text-white text-lg">
+                        {currentUser.username.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="absolute right-0 top-10 w-24 px-4 py-2 bg-gray-800 text-sm text-gray-300 hover:text-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    Logout
+                  </button>
+                </div>
               </>
             ) : (
-              // UI FOR LOGGED-OUT USERS (or when user details are still loading)
-              <Link
-                href="/auth"
-                className="px-4 py-2 text-blue-400 border border-gray-700 rounded-full hover:bg-blue-400/10"
-              >
-                Login / Signup
-              </Link>
+              // --- LOGGED-OUT VIEW (Desktop) ---
+              // This block renders when the user is not logged in.
+              // It now includes the GoogleLoginButton.
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/upload"
+                  className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-700"
+                  title="Create"
+                >
+                  <GoPlusCircle className="text-2xl" />
+                </Link>
+                <button
+                  className="p-2 rounded-full hover:bg-gray-700"
+                  title="Notifications"
+                >
+                  <IoNotificationsOutline className="text-2xl" />
+                </button>
+                <Link
+                  href="/auth"
+                  className="px-4 py-2 text-sm text-blue-400 border border-gray-700 rounded-full hover:bg-blue-400/10"
+                >
+                  Login / Signup
+                </Link>
+              </div>
             )}
           </div>
         </>
       )}
 
-      {/* Mobile View - Search and Upload buttons */}
-
+      {/* --- MOBILE VIEW --- */}
       {isMobile && (
         <>
           <div className="flex items-center gap-4">
-
             <Link href="/" className="text-xl font-bold">
               GoonTube
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button className="p-2 rounded-full hover:bg-gray-700" title="Search">
+              <GoSearch className="text-xl" />
+            </button>
+
+            {isLoggedIn && currentUser ? (
+                // --- LOGGED-IN VIEW (Mobile) ---
+                <>
+                    <Link
+                        href="/upload"
+                        className="p-2 rounded-full hover:bg-gray-700"
+                        title="Upload"
+                    >
+                        <GoPlusCircle className="text-xl" />
+                    </Link>
+                    <Link
+                        href={`/channel/${currentUser.username}`}
+                        className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-700"
+                    >
+                         {currentUser.avatar?.url ? (
+                            <img
+                                src={currentUser.avatar.url}
+                                alt={currentUser.username}
+                                className="w-full h-full rounded-full object-cover"
+                            />
+                            ) : (
+                            <span className="font-bold text-white text-lg">
+                                {currentUser.username.charAt(0).toUpperCase()}
+                            </span>
+                        )}
+                    </Link>
+                </>
+            ) : (
+                // --- LOGGED-OUT VIEW (Mobile) ---
+                
+                <Link
+                  href="/auth"
+                  className="px-3 py-1.5 text-sm text-blue-400 border border-gray-700 rounded-full hover:bg-blue-400/10"
+                >
+                  Login
+                </Link>
+            )}
             
-          {isLoggedIn && (
-            <Link
-              href="/upload"
-              className="p-2 rounded-full hover:bg-gray-700"
-              title="Upload"
-            >
-              <GoPlusCircle className="text-xl" />
-            </Link>
-          )}
-          <button className="p-2 rounded-full hover:bg-gray-700" title="Search">
-            <GoSearch className="text-xl" />
-          </button>
           </div>
-          
         </>
       )}
     </nav>
