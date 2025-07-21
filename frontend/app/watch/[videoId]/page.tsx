@@ -5,7 +5,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatTimeAgo, formatViews } from "@/lib/utils";
-import { ThumbsDown, Share, Download, MoreHorizontal } from "lucide-react";
+import { Share, Download, MoreHorizontal } from "lucide-react";
 import SubscribeButton from "@/app/components/SubscribeButton";
 import CommentsSection from "@/app/components/CommentsSection";
 import SuggestedVideos from "@/app/components/SuggestedVideos";
