@@ -1,12 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation'; // Import new hooks
 import axios from 'axios';
-
-// Import the new modal component
-import GoogleLoginFallbackModal from '../components/GoogleLoginFallbackModal'; 
 import { serverUrl } from '@/lib/constants';
+
+// The AuthContext no longer needs useRouter or useSearchParams
 
 const apiClient = axios.create({
   baseURL: serverUrl,
@@ -39,51 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [completeClose, setCompleteClose] = useState(false);
 
-  // --- NEW STATE FOR THE GOOGLE LOGIN FALLBACK ---
-  const [isFinalizingGoogleLogin, setIsFinalizingGoogleLogin] = useState(false);
-  const [googleLoginError, setGoogleLoginError] = useState<string | null>(null);
-
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // --- NEW EFFECT TO HANDLE GOOGLE LOGIN FINALIZATION ---
-  useEffect(() => {
-    // Check if the special query parameter exists in the URL
-    const isGoogleAuthPending = searchParams.get('google_auth') === 'pending';
-
-    if (isGoogleAuthPending) {
-      // Show the modal immediately
-      setIsFinalizingGoogleLogin(true);
-
-      const finalize = async () => {
-        try {
-          const response = await apiClient.get('/api/v1/users/google/finalize');
-          const data = response.data?.data;
-
-          if (data && data.accessToken) {
-            login(data.accessToken);
-            // On success, close the modal and clean the URL
-            setIsFinalizingGoogleLogin(false);
-            router.replace('/'); // .replace() cleans the URL without adding to history
-          } else {
-            throw new Error('Token was not found in the response.');
-          }
-        } catch (err: unknown) {
-          if (err instanceof Error) {
-          console.error("Google login finalization failed:", err);
-          router.replace('/');
-        }else {
-          console.error("An unexpected error occurred during Google login finalization:", err);
-          }
-
-        }
-      };
-
-      finalize();
-    }
-  }, [searchParams, router]); // This effect runs only when the URL search params change
-
-
+  // This simple effect is all that's needed now.
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     setIsLoggedIn(!!token);
@@ -104,11 +58,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
       }
     } catch (error) {
-      console.error("Backend logout failed:", error);
+      console.error("Backend logout failed, proceeding with client-side logout:", error);
     } finally {
       localStorage.removeItem('accessToken');
       setIsLoggedIn(false);
-      window.location.href = '/auth';
+      window.location.href = '/login';
     }
   };
 
@@ -125,26 +79,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setCompleteClose(true);
   };
 
-  const closeFallbackModal = () => {
-    setIsFinalizingGoogleLogin(false);
-    setGoogleLoginError(null);
-  };
-
   if (isLoading) {
     return null;
   }
 
+  // The provider no longer renders the modal directly.
   return (
     <AuthContext.Provider value={{ isLoggedIn, login, logout, isSidebarOpen, toggleSidebar, closeSidebar, isCompleteClose: completeClose }}>
       {children}
-
-      {/* RENDER THE MODAL when finalization is in progress */}
-      {isFinalizingGoogleLogin && (
-        <GoogleLoginFallbackModal
-          error={googleLoginError}
-          onClose={closeFallbackModal}
-        />
-      )}
     </AuthContext.Provider>
   );
 };
