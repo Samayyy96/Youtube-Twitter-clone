@@ -10,6 +10,7 @@ import {
 import {ApiResponse} from "../utils/ApiResponse.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/like.model.js";
+import { disLike } from "../models/dislike.model.js";
 
 
 // src/controllers/video.controller.js
@@ -41,7 +42,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     if (userId) {
         // If a specific user's videos are requested, filter by their owner ID.
         if (!isValidObjectId(userId)) {
-            throw new ApiError(400, "Invalid userId");
+            throw new apierrors(400, "Invalid userId");
         }
         pipeline.push({
             $match: {
@@ -226,6 +227,14 @@ const getVideoById = asyncHandler(async (req, res) => {
         },
         {
             $lookup:{
+                from:"dislikes",
+                localField: "_id",
+                foreignField: "video",
+                as: "dislikes"
+            }
+        },
+        {
+            $lookup:{
                  from: "users",
                 localField: "owner",
                 foreignField: "_id",
@@ -274,12 +283,22 @@ const getVideoById = asyncHandler(async (req, res) => {
                 likesCount: {
                     $size: "$likes"
                 },
+                dislikesCount: {
+                    $size: "$dislikes"
+                },
                 owner: {
                     $first: "$owner"
                 },
                 isLiked: {
                     $cond: {
                         if: {$in: [req.user?._id, "$likes.likedBy"]},
+                        then: true,
+                        else: false
+                    }
+                },
+                isDisliked: {
+                    $cond: {
+                        if: {$in: [req.user?._id, "$dislikes.dislikedBy"]},
                         then: true,
                         else: false
                     }
@@ -297,7 +316,9 @@ const getVideoById = asyncHandler(async (req, res) => {
                 comments: 1,
                 owner: 1,
                 likesCount: 1,
-                isLiked: 1
+                isLiked: 1,
+                dislikesCount: 1,
+                isDisliked: 1
             }
         }
     ]);
@@ -428,6 +449,10 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
     // delete video likes
     await Like.deleteMany({
+        video: videoId
+    })
+
+    await disLike.deleteMany({
         video: videoId
     })
 

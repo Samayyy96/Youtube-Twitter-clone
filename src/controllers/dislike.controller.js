@@ -1,5 +1,6 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { disLike } from "../models/dislike.model.js";
+import { Like } from "../models/like.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { apierrors } from "../utils/apierrors.js";
@@ -11,7 +12,6 @@ const toggleVideodisLike = asyncHandler(async (req, res) => {
         throw new apierrors(400, "Invalid videoId");
     }
 
-
     const dislikedAlready = await disLike.findOne({
         video: videoId,
         dislikedBy: req.user?._id,
@@ -19,11 +19,16 @@ const toggleVideodisLike = asyncHandler(async (req, res) => {
 
     if (dislikedAlready) {
         await disLike.findByIdAndDelete(dislikedAlready?._id);
-
         return res
             .status(200)
             .json(new ApiResponse(200, { isdisLiked: false }));
     }
+
+    // Remove like if it exists (mutual exclusivity)
+    await Like.findOneAndDelete({
+        video: videoId,
+        likedBy: req.user?._id,
+    });
 
     await disLike.create({
         video: videoId,
