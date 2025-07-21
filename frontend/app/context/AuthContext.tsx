@@ -68,13 +68,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           } else {
             throw new Error('Token was not found in the response.');
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
+          if (err instanceof Error) {
           console.error("Google login finalization failed:", err);
-          const errorMessage = err.response?.data?.message || err.message || "An unknown error occurred.";
-          setGoogleLoginError(`Could not complete sign-in. ${errorMessage}`);
-          // Keep the modal open to show the error.
-          // We still clean the URL.
           router.replace('/');
+        }else {
+          console.error("An unexpected error occurred during Google login finalization:", err);
+          }
+
         }
       };
 
