@@ -4,6 +4,8 @@ import cors from "cors"
 import session from "express-session"; // Import session
 import passport from "passport";     // Import passport
 
+app.set('trust proxy', 1);
+
 import "./config/passport.config.js";
 
 
