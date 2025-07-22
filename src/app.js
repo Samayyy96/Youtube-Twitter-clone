@@ -9,20 +9,23 @@ import passport from "passport";     // Import passport
 import "./config/passport.config.js";
 
 
-const app = express()
+const app = express();
 
 app.set('trust proxy', 1);
+
+import "./config/passport.config.js";
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
-}))
-app.use(express.json({limit:"16kb"}))
-app.use(express.urlencoded({extended:true,limit:"16kb"}))
-app.use(express.static("public"))
-app.use(cookieParser())
+}));
 
+app.use(express.json({ limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(express.static("public"));
+app.use(cookieParser());
 
+// +++ THE FIX IS IN THIS SESSION CONFIGURATION +++
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -30,8 +33,17 @@ app.use(session({
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-    }
+        // Set SameSite to 'none' to allow the cookie to be sent from the Vercel domain to the Render domain.
+        // This is required for cross-site requests.
+        sameSite: 'none',
+        // Explicitly set the domain for the cookie.
+        // The leading dot means it's valid for goontube.onrender.com and its subdomains.
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
+    },
+    // The proxy setting is still important.
+    proxy: true
 }));
+
 
 // Passport Middleware
 app.use(passport.initialize());
