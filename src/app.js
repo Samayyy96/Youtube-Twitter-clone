@@ -4,12 +4,14 @@ import cors from "cors"
 import session from "express-session"; // Import session
 import passport from "passport";     // Import passport
 
-app.set('trust proxy', 1);
+
 
 import "./config/passport.config.js";
 
 
 const app = express()
+
+app.set('trust proxy', 1);
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
