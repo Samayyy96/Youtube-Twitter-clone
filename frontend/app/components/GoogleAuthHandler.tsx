@@ -39,11 +39,14 @@ function AuthHandler() {
           } else {
             throw new Error('Token was not found in the response.');
           }
-        } catch (err: any) {
-          console.error("Google login finalization failed:", err);
-          const errorMessage = err.response?.data?.message || err.message || "An unknown error occurred.";
-          setError(`Could not complete sign-in. ${errorMessage}`);
-          router.replace('/');
+        } catch (err: unknown) {
+          if(err instanceof Error) {
+            console.error("Google login finalization failed:", err);
+            router.replace('/');
+          }
+          else {
+            console.error("An unexpected error occurred during Google login finalization:", err);
+          }
         }
       };
 
