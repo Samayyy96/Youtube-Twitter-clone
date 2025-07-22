@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       localStorage.removeItem('accessToken');
       setIsLoggedIn(false);
-      window.location.href = '/login';
+      window.location.href = '/auth';
     }
   };
 
