@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 import { serverUrl } from '@/lib/constants';
-
+;  
 // The AuthContext no longer needs useRouter or useSearchParams
 
 const apiClient = axios.create({
@@ -85,8 +85,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // The provider no longer renders the modal directly.
   return (
+    
     <AuthContext.Provider value={{ isLoggedIn, login, logout, isSidebarOpen, toggleSidebar, closeSidebar, isCompleteClose: completeClose }}>
       {children}
     </AuthContext.Provider>
+    
   );
 };
