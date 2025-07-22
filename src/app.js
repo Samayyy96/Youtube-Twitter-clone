@@ -35,18 +35,14 @@ const cookieOptions = {
 };
 
 // Add the domain only if in production
-if (isProduction) {
-    // Note: The domain should be the parent domain of your backend to allow credentials
-    // For goontube.onrender.com, the parent domain is onrender.com
-    cookieOptions.domain = 'onrender.com';
-}
+
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: cookieOptions,
-    proxy: true
+    
 }));
 
 
