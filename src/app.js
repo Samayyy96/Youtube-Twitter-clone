@@ -5,10 +5,6 @@ import session from "express-session"; // Import session
 import passport from "passport";     // Import passport
 
 
-
-import "./config/passport.config.js";
-
-
 const app = express();
 
 app.set('trust proxy', 1);
@@ -25,27 +21,35 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-// +++ THE FIX IS IN THIS SESSION CONFIGURATION +++
+
+// --- THIS IS THE FINAL, ROBUST SESSION CONFIGURATION ---
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Define the base cookie options
+const cookieOptions = {
+    secure: isProduction,
+    httpOnly: true,
+    // SameSite must be 'lax' for local development, but 'none' for cross-site production
+    sameSite: isProduction ? 'none' : 'lax'
+};
+
+// Add the domain only if in production
+if (isProduction) {
+    // Note: The domain should be the parent domain of your backend to allow credentials
+    // For goontube.onrender.com, the parent domain is onrender.com
+    cookieOptions.domain = 'onrender.com';
+}
+
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        // Set SameSite to 'none' to allow the cookie to be sent from the Vercel domain to the Render domain.
-        // This is required for cross-site requests.
-        sameSite: 'none',
-        // Explicitly set the domain for the cookie.
-        // The leading dot means it's valid for goontube.onrender.com and its subdomains.
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined,
-    },
-    // The proxy setting is still important.
+    cookie: cookieOptions,
     proxy: true
 }));
 
 
-// Passport Middleware
 app.use(passport.initialize());
 app.use(passport.session());
 

@@ -30,7 +30,11 @@ function AuthHandler() {
       const finalize = async () => {
         try {
           const response = await apiClient.get('/api/v1/users/google/finalize');
+          console.log("Google login finalization response:", response);
           const data = response.data?.data;
+          if (!data) {
+            throw new Error('No data received from the server.');
+          }
 
           if (data && data.accessToken) {
             login(data.accessToken);

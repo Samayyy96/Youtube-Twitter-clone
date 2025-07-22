@@ -76,6 +76,9 @@ const isSessionAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();
     }
+    else {
+        console.log("User session not found. Please try logging in again.");
+    }
     res.status(401).json({ success: false, message: "Unauthorized: No active session." });
 };
 

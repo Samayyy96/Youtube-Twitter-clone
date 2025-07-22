@@ -501,6 +501,7 @@ const finalizeGoogleLogin = asyncHandler(async (req, res) => {
     // Because of the active session, Passport's `req.user` is available.
     if (!req.user) {
         throw new apierrors(401, "User session not found. Please try logging in again.");
+        console.error("User session not found. Please try logging in again.");
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(req.user._id);
