@@ -5,21 +5,10 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { User } from "../models/user.model.js";
 import crypto from "crypto";
 
-// +++ THE FIX IS HERE +++
-// We will explicitly define the callback URL based on the environment.
-const googleCallbackURL = process.env.NODE_ENV === 'production'
-    ? 'https://goontube.onrender.com/api/v1/users/google/callback'
-    : 'http://localhost:3000/api/v1/users/google/callback';
-
-// You can add this log to verify which URL is being used when the server starts.
-console.log(`[Passport] Using Google callback URL: ${googleCallbackURL}`);
-
-
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // We now pass our explicitly defined variable here.
-    callbackURL: googleCallbackURL,
+    callbackURL: "/api/v1/users/google/callback",
     scope: ["profile", "email"]
 },
 async (accessToken, refreshToken, profile, done) => {
@@ -50,7 +39,6 @@ async (accessToken, refreshToken, profile, done) => {
     }
 }));
 
-// No changes needed below this line
 passport.serializeUser((user, done) => {
     done(null, user.id);
 });
