@@ -76,7 +76,7 @@ export default function Navbar() {
               <HiMenu className="text-xl" />
             </button>
             <Link href="/" className="text-xl font-bold">
-              GoonTube
+              Oassis
             </Link>
           </div>
 
