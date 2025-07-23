@@ -1,4 +1,4 @@
-# YouTube-Twitter Clone 🎥🐦
+# Oassis - YouTube-Twitter Clone 🎥🐦
 
 A full-stack social media application that combines features inspired by YouTube and Twitter — built using **MERN Stack** and **Next.js** for a fast, modern user experience.
 
