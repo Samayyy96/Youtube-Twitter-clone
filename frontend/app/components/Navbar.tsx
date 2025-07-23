@@ -170,7 +170,7 @@ export default function Navbar() {
         <>
           <div className="flex items-center gap-4">
             <Link href="/" className="text-xl font-bold">
-              GoonTube
+              Oassis
             </Link>
           </div>
           <div className="flex items-center gap-3">
